@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var oAuthToken string
+
 type Peer struct {
 	ID   string `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`

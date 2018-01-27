@@ -22,6 +22,13 @@ type Commit struct {
 //  GetUserNameFromAuthToken(tokenPt1+tokenPt2)
 //}
 
+////func main() {
+//  tokenPt1 := "93b1d16bf647dea"
+//  tokenPt2 := "360b566e34eddbbad07b89f7a"
+//  GetLatestCommitForUser("jdjack", tokenPt1+tokenPt2)
+//}
+
+// Jacks token: - 67bbbbc9234c47bd77b1720c493ed436801d6cd4
 func GetLatestCommitForUser(username string, oAuthToken string) *Commit {
   url := "https://api.github.com/graphql"
 
