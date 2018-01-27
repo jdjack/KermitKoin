@@ -10,7 +10,11 @@ import (
   "strconv"
   "strings"
   "os"
+  "bytes"
 )
+
+var userName string
+var oAuthToken string
 
 type Block struct {
   Index int `json:"index"`
@@ -46,18 +50,37 @@ type output struct {
 
 type transaction struct {
   Inputs []input `json:"Inputs"`
-  Outputs []input `json:"Outputs"`
+  Outputs []output `json:"Outputs"`
 }
 
-func (block *Block) Verify_transaction(data []byte) bool {
-  t := &transaction{}
-  err := json.Unmarshal(data, t)
-  if err != nil {
-    fmt.Printf("Error: %s", err)
-    return false
+func Verify_transaction(t *transaction) bool {
+  inputSum := 0.
+  inputs := t.Inputs
+  for _, i := range(inputs) {
+    transactionBlock := CurrentChain.getBlockByHash(string(i.Hash))
+    inputSum += i.Amount
+    if !checkValue(i, transactionBlock.User_transaction.Outputs) {
+      return false
+    }
   }
-  return true
 
+  outputSum := 0.
+  for _, o := range(t.Outputs) {
+    outputSum += o.Amount
+  }
+
+  return outputSum == inputSum
+
+
+}
+
+func checkValue(i input, outputs []output) bool {
+  for _, o := range(outputs) {
+    if bytes.Compare(o.To, i.From) == 0 && o.Amount == i.Amount {
+      return true
+    }
+  }
+  return false
 }
 
 func (block *Block) BlockToJsonBlock() *Json_block {
@@ -132,18 +155,35 @@ func int_to_filename(i int) string {
 
 }
 
-func (block *Block) Validate() bool {
+func Validate(block *Block) bool {
+  h := block.Generate_hash()
+  if bytes.Compare(block.Hash, h) != 0 {
+    return false
+  }
 
-  return false
+  if !Verify_transaction(block.User_transaction) {
+    return false
+  }
+
+  if !CheckCommitExistanceForUser(userName, string(block.Git_hash), oAuthToken) {
+    return false
+  }
+
+  return true
 }
 
 func (block *Block) Add_transaction(data []byte) bool {
-  if !block.Verify_transaction(data) {
-    return false
-  }
   t := &transaction{}
   json.Unmarshal(data, t)
+  if !Verify_transaction(t) {
+    return false
+  }
+
   block.User_transaction = t
   return true
+}
+
+func AuthoriseBlock(block *Block) bool {
+  return false
 }
 
