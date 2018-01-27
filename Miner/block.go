@@ -1,6 +1,10 @@
 package main
 
-import "crypto/sha256"
+import (
+  "crypto/sha256"
+  "encoding/json"
+  "fmt"
+)
 
 type Block struct {
   index int
@@ -20,6 +24,15 @@ func (block *Block) generate_hash() string {
   h := sha256.New()
   h.Write([]byte(block.prev_hash + string(block.index) + block.timestamp + block.git_hash))
   return string(h.Sum(nil))
+}
+
+func (block *Block) to_json() string {
+  json, err := json.Marshal(block)
+  if err != nil {
+    fmt.Printf("Error %s", err)
+    return ""
+  }
+  return string(json)
 }
 
 func (block *Block) validate() bool {
