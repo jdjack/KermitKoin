@@ -82,6 +82,17 @@ func checkValue(i input, outputs []output) bool {
   return false
 }
 
+func load_block(index int) *Block {
+  filename := int_to_filename(index) + ".json"
+
+  block := &Block{}
+  if _, err := os.Stat("chain-data/" + filename); os.IsExist(err) {
+    jsonBlock, _ := ioutil.ReadFile("chain-data/" + filename)
+    _= json.Unmarshal(jsonBlock, block)
+  }
+  return block
+}
+
 func (block *Block) Generate_hash() []byte {
   h := sha256.New()
   combined := append(block.Prev_hash, []byte(string(block.Index))...)
