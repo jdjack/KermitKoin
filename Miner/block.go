@@ -83,10 +83,6 @@ func checkValue(i input, outputs []output) bool {
   return false
 }
 
-func (block *Block) BlockToJsonBlock() *Json_block {
-
-}
-
 func (block *Block) Generate_hash() []byte {
   h := sha256.New()
   combined := append(block.Prev_hash, []byte(string(block.Index))...)
@@ -184,6 +180,7 @@ func (block *Block) Add_transaction(data []byte) bool {
 }
 
 func AuthoriseBlock(block *Block) bool {
+
   return false
 }
 
