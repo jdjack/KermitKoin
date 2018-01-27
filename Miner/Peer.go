@@ -28,12 +28,30 @@ func GetPeersReq(w http.ResponseWriter, r *http.Request) {
 
 	// Add the requester to the list of alive IP's
 	client := strings.Split(r.RemoteAddr, ":")[0]
-	livePeers = append(livePeers, Peer{client})
+
+
+	peersWithoutClient := make([]Peer, 0)
+
+	isInLivePeers := false
+	for _, livePeer := range livePeers {
+		if livePeer.IP == client {
+			isInLivePeers = true
+		} else {
+			peersWithoutClient = append(peersWithoutClient, livePeer)
+		}
+	}
+
+	if !isInLivePeers {
+		livePeers = append(livePeers, Peer{client})
+	}
 
 	// Encode the response and send it
-	encoded, err := json.Marshal(livePeers)
-	if err != nil {
+	encoded, err := json.Marshal(peersWithoutClient)
+
+	if err == nil {
+
 		w.Write(encoded)
+
 	} else {
 		log.Fatal(err)
 	}
@@ -203,29 +221,13 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 func getMyIP() string {
 
-	ifaces, _ := net.Interfaces()
-	var result string
-	// handle err
-	for _, i := range ifaces {
-		addrs, _ := i.Addrs()
-		// handle err
-		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
-
-			// Determine if we are a 4-byte or 16-byte IP address
-			stringIP := ip.String()
-			if stringIP != "" {
-				result = stringIP
-			}
-
-		}
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
 	}
-	return result
+	defer conn.Close()
 
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	return localAddr.IP.String()
 }
