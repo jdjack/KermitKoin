@@ -1,5 +1,7 @@
 package main
 
+import "bytes"
+
 type Chain struct {
   chain []Block
 }
@@ -39,7 +41,7 @@ func (chain *Chain) validate() bool {
     }
     // Check all prev_hash values are correct.
     if index > 0 {
-      if block.Prev_hash != (chain.chain[index - 1]).Hash {
+      if bytes.Compare(block.Prev_hash, (chain.chain[index - 1]).Hash) != 0 {
         return false
       }
     }
@@ -57,6 +59,6 @@ func (chain *Chain) addBlock(block Block) {
 
 func (chain *Chain) saveChain() {
   for _, block := range chain.chain {
-    block.Save()
+    block.Save_block()
   }
 }
