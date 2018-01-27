@@ -8,7 +8,7 @@ import (
 var oAuthToken string
 func main() {
 
-  oAuthToken = os.Args[2]
+  oAuthToken = os.Args[1]
 	// Start the server
 	server := StartHTTPServer()
 	defer ShutdownHTTPServer(server)

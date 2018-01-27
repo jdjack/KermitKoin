@@ -69,6 +69,8 @@ func LoadAlwaysOnPeers() []Peer {
 
 		singletonResult := make([]Peer, 0)
 		if getMyIP() == backupIP {
+
+
 			// Do nothing, no peers
 			return singletonResult
 		}
