@@ -88,3 +88,52 @@ func FetchLivePeers() []Peer {
 
 	return livePeers
 }
+
+// Fetch the current blockchain from one of the live peers
+func FetchCurrentBlockchain() Chain {
+
+	success := false
+	chain := make(Chain)
+	for !success {
+
+		// Choose a random peer to get the chain from
+		randPeerIndex := rand.Intn(len(livePeers) - 1)
+		randPeerIP := livePeers[randPeerIndex].IP
+		r, err := netClient.Get("http://" + randPeerIP + "/getBlockchain")
+
+		if err != nil {
+			// Remove this peer from the list
+			livePeers = append(
+				livePeers[:randPeerIndex],
+				livePeers[randPeerIndex+1:]...)
+
+			log.Print(err)
+			continue
+		}
+		defer r.Body.Close()
+
+		// Decode the response
+		buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
+		_, readErr := buf.ReadFrom(r.Body)
+		body := buf.Bytes()
+		// TODO: pass to liam
+		success = true
+
+	}
+
+	return chain
+
+}
+
+// Handling a /getBlockchain request
+func GetBlockchainReq(w http.ResponseWriter, r *http.Request) {
+
+	// Give the user the current blockchain
+	encoded, err := json.Marshal(CurrentChain)
+	if err != nil {
+		w.Write(encoded)
+	} else {
+		log.Fatal(err)
+	}
+
+}
