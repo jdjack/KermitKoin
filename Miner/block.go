@@ -219,5 +219,7 @@ func CreateBlock(git_hash []byte) {
 
   json_block := block.Block_to_json()
 
-  
+  println(json_block)
+
+
 }
