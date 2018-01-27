@@ -11,15 +11,15 @@ import (
   "strings"
   "os"
   "bytes"
+  "time"
 )
-
 
 type Block struct {
   Index             int          `json:"index"`
   Prev_hash         []byte       `json:"prev_hash"`
   Git_hash          []byte       `json:"git_hash"`
-  userName          string       `json:"userName"`
-  Timestamp         int          `json:"timestamp"`
+  UserName          string       `json:"userName"`
+  Timestamp         int64        `json:"timestamp"`
   Miner_transaction *transaction `json:"miner_transaction"`
   User_transaction  *transaction `json:"user_transaction"`
   Hash              []byte       `jason:"hash"`
@@ -36,13 +36,13 @@ type Json_block struct {
 }
 
 type input struct {
-  From   []byte  `json:"From"`
+  From   int     `json:"From"`
   Amount float64 `json:"Amount"`
   Hash   []byte  `json:"Hash"`
 }
 
 type output struct {
-  To     []byte  `json:"To"`
+  To     int     `json:"To"`
   Amount float64 `json:"Amount"`
 }
 
@@ -73,7 +73,7 @@ func Verify_transaction(t *transaction) bool {
 
 func checkValue(i input, outputs []output) bool {
   for _, o := range (outputs) {
-    if bytes.Compare(o.To, i.From) == 0 && o.Amount == i.Amount {
+    if o.To == i.From && o.Amount == i.Amount {
       return true
     }
   }
@@ -158,7 +158,7 @@ func Validate(block *Block) bool {
     return false
   }
 
-  if !CheckCommitExistanceForUser(block.userName, string(block.Git_hash), oAuthToken) {
+  if !CheckCommitExistanceForUser(block.UserName, string(block.Git_hash), oAuthToken) {
     return false
   }
 
@@ -187,4 +187,37 @@ func AuthoriseBlock(block *Block) bool {
   }
 
   return false
+}
+
+func CreateBlock(git_hash []byte) {
+  lastBlock := CurrentChain.getLatestBlock()
+
+  miner_transaction := &transaction{
+    Inputs: append(make([]input, 0), input{
+      From:   0,
+      Amount: 5.0,
+      Hash:   nil,
+    }),
+    Outputs: append(make([]output, 0), output{
+      To:     12344,
+      Amount: 5.0,
+    }),
+  }
+
+  block := &Block{
+    Index:             lastBlock.Index + 1,
+    Prev_hash:         lastBlock.Hash,
+    Git_hash:          git_hash,
+    User_transaction:  nil,
+    Timestamp:         time.Now().Unix(),
+    Miner_transaction: miner_transaction,
+  }
+
+  block.Hash = block.Generate_hash()
+
+  CurrentChain.addBlock(*block)
+
+  json_block := block.Block_to_json()
+
+  
 }
