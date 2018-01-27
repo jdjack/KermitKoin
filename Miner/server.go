@@ -19,7 +19,6 @@ func StartHTTPServer() *http.Server {
 	// Start the listening thread
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			// cannot panic, because this probably is an intentional close
 			log.Printf("Httpserver: ListenAndServe() error: %s", err)
 		}
 	}()

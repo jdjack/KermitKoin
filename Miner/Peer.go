@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -40,7 +41,23 @@ func GetPeersReq(w http.ResponseWriter, r *http.Request) {
 }
 
 // Loads the always on peers from a file
-func GetAlwaysOnPeers() []Peer {
+func LoadAlwaysOnPeers() []Peer {
+
+	path := "/peers.txt"
+	backupIP := "129.31.196.107"
+
+	// If the file does not exist, use the backup IP
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+
+		singletonResult := make([]Peer, 0)
+		if getMyIP() == backupIP {
+			// Do nothing, no peers
+			return singletonResult
+		}
+
+		singletonResult = append(singletonResult, Peer{backupIP})
+		return singletonResult
+	}
 
 	// Peers are stored as a list of IP's on each line of a file
 	file, err := os.Open("/peers.txt")
@@ -66,6 +83,10 @@ func GetAlwaysOnPeers() []Peer {
 
 // Fetch the live peers from a known peer
 func FetchLivePeers() []Peer {
+
+	if len(alwaysOnPeers) == 0 {
+		return make([]Peer, 0)
+	}
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -161,5 +182,34 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 	// Pass the result to authorize block
 	// Return true or false if successful authorized
+
+}
+
+func getMyIP() string {
+
+	ifaces, _ := net.Interfaces()
+	var result string
+	// handle err
+	for _, i := range ifaces {
+		addrs, _ := i.Addrs()
+		// handle err
+		for _, addr := range addrs {
+			var ip net.IP
+			switch v := addr.(type) {
+			case *net.IPNet:
+				ip = v.IP
+			case *net.IPAddr:
+				ip = v.IP
+			}
+
+			// Determine if we are a 4-byte or 16-byte IP address
+			stringIP := ip.String()
+			if stringIP != "" {
+				result = stringIP
+			}
+
+		}
+	}
+	return result
 
 }

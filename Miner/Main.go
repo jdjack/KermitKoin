@@ -11,6 +11,13 @@ func main() {
 	server := StartHTTPServer()
 	defer ShutdownHTTPServer(server)
 
+	// Load always-on peers
+	alwaysOnPeers = LoadAlwaysOnPeers()
+	livePeers = FetchLivePeers()
+
+	// Start mining
+	// go mine()
+
 	// Listen for a command from the front-end
 	var text string
 	for text != "shutdown\n" {
