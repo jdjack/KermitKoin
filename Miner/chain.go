@@ -35,7 +35,7 @@ func (chain *Chain) getBlockByHash(hash string) *Block {
 func (chain *Chain) validate() bool {
   for index, block := range chain.chain {
     // Check blocks are valid.
-    if !block.Validate() {
+    if !Validate(&block) {
       return false
     }
     // Check blocks are in order.
