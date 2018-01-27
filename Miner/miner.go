@@ -8,7 +8,13 @@ import (
   "bytes"
 )
 
+//var transactionQueue list
+
+//func transactionQueue
 func mine() {
+
+  //transactionQueue := list.New()
+
   var username string = GetUserNameFromAuthToken(oAuthToken)
   var previousHash []byte
   if _, err := os.Stat("previous-hash"); os.IsNotExist(err) {

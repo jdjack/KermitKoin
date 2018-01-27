@@ -178,6 +178,22 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch the request paramater
 
+	decoder := json.NewDecoder(r.Body)
+
+	block := &Block{}
+
+	err := decoder.Decode(block)
+
+	if err != nil {
+	  panic(err)
+  }
+
+  r.Body.Close()
+
+  if AuthoriseBlock(block) {
+    SendBlock(block)
+  }
+
 	// Call json_to_block
 
 	// Pass the result to authorize block
