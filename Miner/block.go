@@ -34,6 +34,16 @@ func (block *Block) to_json() string {
   return string(j)
 }
 
+func json_to_block(json_string []byte) *Block {
+  block := &Block{}
+  err := json.Unmarshal(json_string, block)
+  if err != nil {
+    fmt.Printf("Error: %s", err)
+    return nil
+  }
+  return block
+}
+
 func (block *Block) validate() bool {
   return false;
 }
