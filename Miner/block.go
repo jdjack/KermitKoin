@@ -4,29 +4,42 @@ import (
   "crypto/sha256"
   "encoding/json"
   "fmt"
+  "encoding/base64"
+  "net/http"
+  "time"
 )
 
 type Block struct {
-  index int
-  prev_hash string
-  git_hash string
-  repo_id string
-  timestamp string
-  data string
+  Index int `json:"index"`
+  Prev_hash []byte `json:"prev_hash"`
+  Git_hash []byte `json:"git_hash"`
+  Repo_id []byte `json:"repo_id"`
+  Timestamp []byte `json:"timestamp"`
+  Data []byte `json:"data"`
+  Hash []byte `json:"hash"`
 }
 
-func (block *Block) verify_transaction() bool {
+func (block *Block) Verify_transaction(chain Chain) bool {
   return false
 }
 
-func (block *Block) generate_hash() string {
+func (block *Block) Generate_hash() []byte {
   h := sha256.New()
-  h.Write([]byte(block.prev_hash + string(block.index) + block.timestamp + block.git_hash))
-  return string(h.Sum(nil))
+  combined := append(block.Prev_hash, []byte(string(block.Index))...)
+  combined = append(combined, block.Prev_hash...)
+  combined = append(combined, block.Timestamp...)
+  combined = append(combined, block.Data...)
+  combined = append(combined, block.Git_hash...)
+
+  h.Write(combined)
+  return h.Sum(nil)
 }
 
-func (block *Block) to_json() string {
-  j, err := json.Marshal(block)
+func (block *Block) Block_to_json() string {
+  data := base64.StdEncoding.EncodeToString(block.Data)
+  b := block
+  b.Data = []byte(data)
+  j, err := json.Marshal(b)
   if err != nil {
     fmt.Printf("Error %s", err)
     return ""
@@ -34,8 +47,30 @@ func (block *Block) to_json() string {
   return string(j)
 }
 
-func (block *Block) validate() bool {
-  return false;
+func Json_to_block(json_string []byte) *Block {
+  block := &Block{}
+  err := json.Unmarshal(json_string, block)
+  if err != nil {
+    fmt.Printf("Error: %s", err)
+    return nil
+  }
+  var decoded_data []byte
+  base64.StdEncoding.Decode(block.Data, decoded_data)
+  block.Data = decoded_data
+  return block
+}
+
+func (block *Block) Validate() bool {
+  hash := block.Generate_hash()
+
+  git_url := "https://api.github.com/graphql"
+
+  client := http.Client{Timeout: time.Second * 10}
+
+  req, err := http.NewRequest(http.MethodGet, git_url, nil)
+
+  res, get
+  return false
 }
 
 
