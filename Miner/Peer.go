@@ -23,7 +23,7 @@ var alwaysOnPeers []Peer
 var livePeers []Peer
 
 // Send all the peers that are alive
-func GetPeers(w http.ResponseWriter, r *http.Request) {
+func GetPeersReq(w http.ResponseWriter, r *http.Request) {
 
 	// Add the requester to the list of alive IP's
 	client := strings.Split(r.RemoteAddr, ":")[0]
@@ -86,7 +86,10 @@ func FetchLivePeers() []Peer {
 
 	// Read and parse the response
 	buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
-	_, readErr := buf.ReadFrom(r.Body)
+	_, err = buf.ReadFrom(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
 	body := buf.Bytes()
 	livePeers := make([]Peer, 0)
 	json.Unmarshal(body, &livePeers)
@@ -98,7 +101,7 @@ func FetchLivePeers() []Peer {
 func FetchCurrentBlockchain() Chain {
 
 	success := false
-	chain := make(Chain)
+	chain := &Chain{}
 	for !success {
 
 		// Choose a random peer to get the chain from
@@ -119,14 +122,17 @@ func FetchCurrentBlockchain() Chain {
 
 		// Decode the response
 		buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
-		_, readErr := buf.ReadFrom(r.Body)
-		body := buf.Bytes()
+		_, err = buf.ReadFrom(r.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		// body := buf.Bytes()
 		// TODO: pass to liam
 		success = true
 
 	}
 
-	return chain
+	return *chain
 
 }
 

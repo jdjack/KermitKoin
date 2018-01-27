@@ -1,22 +1,21 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"log"
-	"net/http"
+	"bufio"
+	"os"
 )
 
 func main() {
 
-	// Create a new router to route requests
-	router := mux.NewRouter()
+	// Start the server
+	server := StartHTTPServer()
+	defer ShutdownHTTPServer(server)
 
-	// Route endpoints to function handlers
-	router.HandleFunc("/getPeers", GetPeers).Methods("GET")
-	router.HandleFunc("/getBlockchain", GetBlockchainReq).Methods("GET")
-	router.HandleFunc("/authorizeBlock/{block}", AuthorizeBlockReq).Methods("POST")
-
-	// Unknown request sent
-	log.Fatal(http.ListenAndServe(":8081", router))
+	// Listen for a command from the front-end
+	var text string
+	for text != "shutdown\n" {
+		reader := bufio.NewReader(os.Stdin)
+		text, _ = reader.ReadString('\n')
+	}
 
 }
