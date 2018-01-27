@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -23,6 +24,10 @@ var livePeers []Peer
 
 // Send all the peers that are alive
 func GetPeers(w http.ResponseWriter, r *http.Request) {
+
+	// Add the requester to the list of alive IP's
+	client := strings.Split(r.RemoteAddr, ":")[0]
+	livePeers = append(livePeers, Peer{client})
 
 	// Encode the response and send it
 	encoded, err := json.Marshal(livePeers)
@@ -125,15 +130,30 @@ func FetchCurrentBlockchain() Chain {
 
 }
 
-// Handling a /getBlockchain request
+// Handle a /getBlockchain request
 func GetBlockchainReq(w http.ResponseWriter, r *http.Request) {
 
 	// Give the user the current blockchain
 	encoded, err := json.Marshal(CurrentChain)
 	if err != nil {
-		w.Write(encoded)
+		_, err := w.Write(encoded)
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else {
 		log.Fatal(err)
 	}
+
+}
+
+// Handles a /authorizeBlock request
+func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
+
+	// Fetch the request paramater
+
+	// Call json_to_block
+
+	// Pass the result to authorize block
+	// Return true or false if successful authorized
 
 }
