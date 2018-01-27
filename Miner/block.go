@@ -218,6 +218,7 @@ func CreateBlock(git_hash []byte) bool {
   block.Hash = block.Generate_hash()
 
   CurrentChain.addBlock(*block)
+  block.Save_block()
 
   return true
 

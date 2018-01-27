@@ -20,7 +20,7 @@ func mine() {
   if _, err := os.Stat("previous-hash"); os.IsNotExist(err) {
 
     commit := GetLatestCommitForUser(username, oAuthToken)
-    if (commit != nil) {
+    if commit != nil {
       previousHash = []byte(commit.ID)
       ioutil.WriteFile("previous-hash", previousHash, 0644)
       fmt.Printf("Found New Commit: %v\n With Message: %s", previousHash, commit.Message)
@@ -29,15 +29,17 @@ func mine() {
     }
     CreateBlock(previousHash)
   } else {
-    previousHash, _ = ioutil.ReadFile("previoius-hash")
+    previousHash, _ = ioutil.ReadFile("previous-hash")
   }
 
   for ;; {
-    time.Sleep(time.Minute * 2)
+
+    time.Sleep(time.Second * 10)
     commit := GetLatestCommitForUser(username, oAuthToken)
     hash := []byte(commit.ID)
-    if (bytes.Compare(hash, previousHash) != 0) {
-      fmt.Printf("Found New Commit: %v\n With Message: %s", previousHash, commit.Message)
+
+    if bytes.Compare(hash, previousHash) == 0 {
+      fmt.Printf("Found New Commit: %v\n With Message: %s", hash, commit.Message)
       previousHash = hash
       ioutil.WriteFile("previous-hash", previousHash, 0644)
       CreateBlock(hash)
