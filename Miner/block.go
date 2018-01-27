@@ -12,6 +12,8 @@ import (
   "os"
   "bytes"
   "time"
+  "net/http"
+  "log"
 )
 
 type Block struct {
@@ -186,10 +188,10 @@ func AuthoriseBlock(block *Block) bool {
     CurrentChain.addBlock(*block)
   }
 
-  return false
+  return true
 }
 
-func CreateBlock(git_hash []byte) {
+func CreateBlock(git_hash []byte) bool {
   lastBlock := CurrentChain.getLatestBlock()
 
   miner_transaction := &transaction{
@@ -217,9 +219,22 @@ func CreateBlock(git_hash []byte) {
 
   CurrentChain.addBlock(*block)
 
-  json_block := block.Block_to_json()
+  return true
 
-  println(json_block)
+}
 
+func SendBlock(block *Block) {
+  jsonBlock := block.Block_to_json()
 
+  for _, peer := range(livePeers) {
+    url := "http://" + peer.IP + ":8081/authoriseBlock/"
+
+    req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBlock)))
+
+    if err != nil {
+      log.Fatal(err)
+    }
+
+    netClient.Do(req)
+  }
 }

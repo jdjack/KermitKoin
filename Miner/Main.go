@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+var oAuthToken string
 func main() {
 
 	// Start the server
@@ -16,7 +17,7 @@ func main() {
 	livePeers = FetchLivePeers()
 
 	// Start mining
-	// go mine()
+	go mine()
 
 	// Listen for a command from the front-end
 	var text string
