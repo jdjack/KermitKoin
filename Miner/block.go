@@ -4,18 +4,26 @@ import (
   "crypto/sha256"
   "encoding/json"
   "fmt"
-  "encoding/base64"
-  //"net/http"
+  //"encoding/base64"
   //"time"
   "io/ioutil"
   "strconv"
   "strings"
   "os"
-  "net/http"
-  "time"
 )
 
 type Block struct {
+  Index int `json:"index"`
+  Prev_hash []byte `json:"prev_hash"`
+  Git_hash []byte `json:"git_hash"`
+  Repo_id []byte `json:"repo_id"`
+  Timestamp int `json:"timestamp"`
+  Miner_transaction *transaction `json:"miner_transaction"`
+  User_transaction *transaction `json:"user_transaction"`
+  Hash []byte `jason:"hash"`
+}
+
+type Json_block struct {
   Index int `json:"index"`
   Prev_hash []byte `json:"prev_hash"`
   Git_hash []byte `json:"git_hash"`
@@ -25,16 +33,46 @@ type Block struct {
   Hash []byte `json:"hash"`
 }
 
-func (block *Block) Verify_transaction(chain Chain) bool {
-  return false
+type input struct {
+  From []byte `json:"From"`
+  Amount float64 `json:"Amount"`
+  Hash []byte `json:"Hash"`
+}
+
+type output struct {
+  To []byte `json:"To"`
+  Amount float64 `json:"Amount"`
+}
+
+type transaction struct {
+  Inputs []input `json:"Inputs"`
+  Outputs []input `json:"Outputs"`
+}
+
+func (block *Block) Verify_transaction(data []byte) bool {
+  t := &transaction{}
+  err := json.Unmarshal(data, t)
+  if err != nil {
+    fmt.Printf("Error: %s", err)
+    return false
+  }
+  return true
+
+}
+
+func (block *Block) BlockToJsonBlock() *Json_block {
+
 }
 
 func (block *Block) Generate_hash() []byte {
   h := sha256.New()
   combined := append(block.Prev_hash, []byte(string(block.Index))...)
   combined = append(combined, block.Prev_hash...)
-  combined = append(combined, block.Timestamp...)
-  combined = append(combined, block.Data...)
+  combined = append(combined, []byte(string(block.Timestamp))...)
+  userTransactionJson, _ := json.Marshal(block.User_transaction)
+  minerTransactionJson, _ := json.Marshal(block.Miner_transaction)
+  combined = append(combined, userTransactionJson...)
+  combined = append(combined, minerTransactionJson...)
   combined = append(combined, block.Git_hash...)
 
   h.Write(combined)
@@ -42,10 +80,13 @@ func (block *Block) Generate_hash() []byte {
 }
 
 func (block *Block) Block_to_json() []byte {
-  data := base64.StdEncoding.EncodeToString(block.Data)
-  b := block
-  b.Data = []byte(data)
-  j, err := json.Marshal(b)
+  //data_json, _ := json.Marshal(block.User_transaction)
+  //minerJson, _ := json.Marshal(block.Miner_transaction)
+  //data_json = append(data_json, minerJson...)
+  //data := base64.StdEncoding.EncodeToString(data_json)
+  //b := Json_block{block.Index, block.Prev_hash, block.Git_hash, block.Repo_id, []byte(string()), []byte(data), block.Hash}
+  //b.Data = []byte(data)
+  j, err := json.Marshal(block)
   if err != nil {
     fmt.Printf("Error %s", err)
     return make([]byte, 0)
@@ -60,9 +101,18 @@ func Json_to_block(json_string []byte) *Block {
     fmt.Printf("Error: %s", err)
     return nil
   }
-  var decoded_data []byte
-  base64.StdEncoding.Decode(block.Data, decoded_data)
-  block.Data = decoded_data
+  //var decoded_data []byte
+  //base64.StdEncoding.Decode(json_block.Data, decoded_data)
+  //t, err := strconv.Atoi(string(json_block.Timestamp))
+  //block := &Block{
+  //  Index :     json_block.Index,
+  //  Prev_hash : json_block.Prev_hash,
+  //  Git_hash :  json_block.Git_hash,
+  //  Repo_id :   json_block.Repo_id,
+  //  Timestamp : t,
+  //  Hash :      json_block.Hash,
+  //  }
+
   return block
 }
 
@@ -80,22 +130,20 @@ func int_to_filename(i int) string {
   zeroes := strings.Repeat("0", 16 - len(str))
   return zeroes + str
 
-
 }
 
 func (block *Block) Validate() bool {
-  //hash := block.Generate_hash()
-  //
-  //git_url := "https://api.github.com/graphql"
-  //
-  //client := http.Client{Timeout: time.Second * 10}
-  //
-  //req, err := http.NewRequest(http.MethodGet, git_url, nil)
-  //
-  //res, getErr := client.Do(req)
-  //
-  //// token : 915654d075db14e717a429e34f4fb3ce37cdc333
+
   return false
 }
 
+func (block *Block) Add_transaction(data []byte) bool {
+  if !block.Verify_transaction(data) {
+    return false
+  }
+  t := &transaction{}
+  json.Unmarshal(data, t)
+  block.User_transaction = t
+  return true
+}
 

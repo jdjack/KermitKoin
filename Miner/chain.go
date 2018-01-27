@@ -2,6 +2,9 @@ package main
 
 import "bytes"
 
+var CurrentChain *Chain
+var RejectedChain *Chain
+
 type Chain struct {
   chain []Block
 }
