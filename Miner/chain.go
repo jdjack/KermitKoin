@@ -55,4 +55,8 @@ func (chain *Chain) addBlock(block Block) {
   chain.chain = append(chain.chain, block)
 }
 
-
+func (chain *Chain) saveChain() {
+  for _, block := range chain.chain {
+    block.Save()
+  }
+}
