@@ -32,6 +32,10 @@ func (chain *Chain) getBlockByHash(hash string) *Block {
   return nil
 }
 
+func (chain *Chain) getLatestBlock() *Block {
+  return &chain.chain[len(chain.chain) - 1]
+}
+
 func (chain *Chain) validate() bool {
   for index, block := range chain.chain {
     // Check blocks are valid.
