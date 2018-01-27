@@ -19,7 +19,7 @@ func (chain *Chain) getBlockByIndex(index int) *Block {
 func (chain *Chain) getBlockByHash(hash string) *Block {
   var retBlock Block
   for _, block := range chain.chain {
-    if block.hash == hash {
+    if string(block.Hash) == hash {
       retBlock = block
       return &retBlock
     }
@@ -30,16 +30,16 @@ func (chain *Chain) getBlockByHash(hash string) *Block {
 func (chain *Chain) validate() bool {
   for index, block := range chain.chain {
     // Check blocks are valid.
-    if !block.validate() {
+    if !block.Validate() {
       return false
     }
     // Check blocks are in order.
-    if block.index != index {
+    if block.Index != index {
       return false
     }
     // Check all prev_hash values are correct.
     if index > 0 {
-      if block.prev_hash != (chain.chain[index - 1]).hash {
+      if block.Prev_hash != (chain.chain[index - 1]).Hash {
         return false
       }
     }
@@ -50,3 +50,9 @@ func (chain *Chain) validate() bool {
   }
   return true
 }
+
+func (chain *Chain) addBlock(block Block) {
+  chain.chain = append(chain.chain, block)
+}
+
+
