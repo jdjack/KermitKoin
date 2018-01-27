@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"io/ioutil"
 )
 
 type Peer struct {
@@ -70,6 +71,23 @@ func LoadAlwaysOnPeers() []Peer {
 		singletonResult := make([]Peer, 0)
 		if getMyIP() == backupIP {
 
+			// I am the genesis user - load the blockchain if needed
+			if CurrentChain == nil {
+				CurrentChain = &Chain{}
+				files, err := ioutil.ReadDir("chain-data/")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				for _, f := range files {
+					if f.Name() == ".DS_Store" {
+						continue
+					}
+
+					b := load_block_with_filename(f.Name())
+					CurrentChain.addBlock(*b)
+				}
+			}
 
 			// Do nothing, no peers
 			return singletonResult

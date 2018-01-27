@@ -16,6 +16,8 @@ func mine() {
   //transactionQueue := list.New()
 
   var username string = GetUserNameFromAuthToken(oAuthToken)
+  fmt.Println("Welcome, " + username)
+  fmt.Println("Mining will start in 2 minutes")
   var previousHash []byte
   if _, err := os.Stat("previous-hash"); os.IsNotExist(err) {
 
@@ -38,8 +40,8 @@ func mine() {
     commit := GetLatestCommitForUser(username, oAuthToken)
     hash := []byte(commit.ID)
 
-    if bytes.Compare(hash, previousHash) == 0 {
-      fmt.Printf("Found New Commit: %v\n With Message: %s", hash, commit.Message)
+    if bytes.Compare(hash, previousHash) != 0 {
+      fmt.Printf("Found New Commit: %v\n With Message: %s - Mining its block!", hash, commit.Message)
       previousHash = hash
       ioutil.WriteFile("previous-hash", previousHash, 0644)
       CreateBlock(hash)

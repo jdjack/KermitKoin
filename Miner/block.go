@@ -93,6 +93,20 @@ func load_block(index int) *Block {
   return block
 }
 
+func load_block_with_filename(filename string) *Block {
+  block := &Block{}
+
+  if _, err := os.Stat("chain-data/" + filename); os.IsNotExist(err) {
+    return block
+  }
+
+  jsonBlock, _ := ioutil.ReadFile("chain-data/" + filename)
+  _= json.Unmarshal(jsonBlock, block)
+
+  return block
+
+}
+
 func (block *Block) Generate_hash() []byte {
   h := sha256.New()
   combined := append(block.Prev_hash, []byte(string(block.Index))...)
@@ -228,6 +242,7 @@ func CreateBlock(git_hash []byte) bool {
 
   block.Hash = block.Generate_hash()
 
+  fmt.Println("Test")
   CurrentChain.addBlock(*block)
   block.Save_block()
 
