@@ -165,8 +165,14 @@ func FetchCurrentBlockchain() Chain {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// body := buf.Bytes()
-		// TODO: pass to liam
+		chain := &Chain{}
+		err = json.Unmarshal(buf.Bytes(), chain)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		CurrentChain = chain
+
 		success = true
 
 	}
