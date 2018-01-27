@@ -165,8 +165,14 @@ func FetchCurrentBlockchain() Chain {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// body := buf.Bytes()
-		// TODO: pass to liam
+		chain := &Chain{}
+		err = json.Unmarshal(buf.Bytes(), chain)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		CurrentChain = chain
+
 		success = true
 
 	}
@@ -195,6 +201,22 @@ func GetBlockchainReq(w http.ResponseWriter, r *http.Request) {
 func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch the request paramater
+
+	decoder := json.NewDecoder(r.Body)
+
+	block := &Block{}
+
+	err := decoder.Decode(block)
+
+	if err != nil {
+	  panic(err)
+  }
+
+  r.Body.Close()
+
+  if AuthoriseBlock(block) {
+    SendBlock(block)
+  }
 
 	// Call json_to_block
 
