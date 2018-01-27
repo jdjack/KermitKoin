@@ -16,7 +16,6 @@ type Block struct {
 }
 
 func (block *Block) verify_transaction() bool {
-
   return false
 }
 
@@ -27,15 +26,16 @@ func (block *Block) generate_hash() string {
 }
 
 func (block *Block) to_json() string {
-  json, err := json.Marshal(block)
+  j, err := json.Marshal(block)
   if err != nil {
     fmt.Printf("Error %s", err)
     return ""
   }
-  return string(json)
+  return string(j)
 }
 
 func (block *Block) validate() bool {
   return false;
 }
+
 
