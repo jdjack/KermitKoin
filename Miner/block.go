@@ -12,6 +12,7 @@ import (
   "os"
   "bytes"
   "time"
+  "net/http"
 )
 
 type Block struct {
@@ -217,9 +218,19 @@ func CreateBlock(git_hash []byte) {
 
   CurrentChain.addBlock(*block)
 
-  json_block := block.Block_to_json()
+  SendBlock(block)
 
-  println(json_block)
+}
 
+func SendBlock(block *Block) {
+  jsonBlock := block.Block_to_json()
 
+  for _, peer := range(livePeers) {
+    url := "http://" + peer.IP + ":8081/authoriseBlock/" + string(jsonBlock)
+
+    _, err := netClient.Get(url)
+    if err != nil {
+      panic(err)
+    }
+  }
 }
