@@ -28,3 +28,5 @@ JavaWallet/out/production/KermitKoin/kermit/sendForm\.fxml
 JavaWallet/out/production/KermitKoin/kermit/wallet\.css
 
 JavaWallet/out/production/KermitKoin/kermit/walletUI\.fxml
+
+*.ser

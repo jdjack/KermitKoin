@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
   "fmt"
   "math/rand"
+  "strconv"
 )
 
 type balance struct {
@@ -85,6 +86,73 @@ func GetBalanceReq(w http.ResponseWriter, req *http.Request) {
 }
 
 func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
+  ownIDs, ok := req.URL.Query()["ownID"]
+  destIDs, ok1 := req.URL.Query()["destID"]
+  amounts, ok2 := req.URL.Query()["amount"]
+
+  if !(ok && ok1 && ok2) {
+    fmt.Printf("Bad Request")
+    return
+  }
+
+  ownID := ownIDs[0]
+  destID := destIDs[0]
+  amountStr := amounts[0]
+  amount, _ := strconv.ParseFloat(amountStr, 64)
+
+  ourValidInputs := ValidInputs[ownID]
+
+  var counter float64 = 0
+  index := 0
+  inputsUsed := make([]input, 0)
+
+  for counter < amount {
+    inp := ourValidInputs[index]
+    counter += inp.Amount
+    inputsUsed = append(inputsUsed, inp)
+    index++
+  }
+
+  change := counter - amount
+
+  if change < 0 {
+    fmt.Printf("Insufficient Funds")
+    return
+  }
+
+  outputs := make([]output, 0)
+  recipientOutput := output{destID, amount}
+  outputs = append(outputs, recipientOutput)
+  if change != 0 {
+    selfOutput := output{ownID, change}
+    outputs = append(outputs, selfOutput)
+  }
+
+  transac := transaction{inputsUsed, outputs}
+
+  // Encode the response and send it
+  encoded, err := json.Marshal(transac)
+
+  if err == nil {
+    for _, peer := range(livePeers) {
+      url := "http://" + peer.IP + ":8081/addTransaction"
+
+      req, err := http.NewRequest("POST", url, strings.NewReader(string(encoded)))
+
+      if err != nil {
+        log.Fatal(err)
+      }
+
+      fmt.Print("Sending Block\n")
+
+      netClient.Do(req)
+    }
+
+    w.Write([]byte("Success"))
+
+  } else {
+    log.Fatal(err)
+  }
 
 }
 
