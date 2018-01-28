@@ -166,7 +166,7 @@ func FetchCurrentBlockchain() Chain {
 		// Choose a random peer to get the chain from
 		randPeerIndex := rand.Intn(len(livePeers) - 1)
 		randPeerIP := livePeers[randPeerIndex].IP
-		r, err := netClient.Get("http://" + randPeerIP + "/getBlockchain")
+		r, err := netClient.Get("http://" + randPeerIP + ":8081/getBlockchain")
 
 		if err != nil {
 			// Remove this peer from the list
