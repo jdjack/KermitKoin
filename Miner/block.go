@@ -24,7 +24,7 @@ type Block struct {
   Timestamp         int64        `json:"timestamp"`
   Miner_transaction *transaction `json:"miner_transaction"`
   User_transaction  *transaction `json:"user_transaction"`
-  Hash              []byte       `jason:"hash"`
+  Hash              []byte       `json:"hash"`
 }
 
 type Json_block struct {
