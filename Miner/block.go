@@ -240,6 +240,8 @@ func AuthoriseBlock(block *Block) bool {
     }
   }
 
+  block.Save_block()
+
   return true
 }
 
