@@ -197,7 +197,7 @@ func Validate(block *Block) bool {
 
 func (block *Block) Add_transaction(t *transaction) bool {
   if !Verify_transaction(t) {
-    return
+    return false
   }
   block.User_transaction = t
   return true
@@ -267,6 +267,16 @@ func CreateBlock(git_hash []byte) bool {
     Miner_transaction: miner_transaction,
   }
 
+  t := TransactionQueue.Front()
+  var trans transaction
+  if t != nil {
+    TransactionQueue.Remove(t)
+    trans = t.Value.(transaction)
+  }
+  for !block.Add_transaction(&trans) && t != nil {
+    t = TransactionQueue.Front()
+    trans = t.Value.(transaction)
+  }
   block.Hash = block.Generate_hash()
   seenHashes = append(seenHashes, block.Hash)
   fmt.Println("Test")
@@ -283,6 +293,24 @@ func SendBlock(block *Block) {
 
   for _, peer := range(livePeers) {
     url := "http://" + peer.IP + ":8081/authorizeBlock"
+
+    req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBlock)))
+
+    if err != nil {
+      log.Fatal(err)
+    }
+
+    fmt.Print("Sending Block\n")
+
+    netClient.Do(req)
+  }
+}
+
+func SendTransaction(trans *transaction) {
+  jsonBlock, _ := json.Marshal(trans)
+
+  for _, peer := range(livePeers) {
+    url := "http://" + peer.IP + ":8081/addTransaction"
 
     req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBlock)))
 
