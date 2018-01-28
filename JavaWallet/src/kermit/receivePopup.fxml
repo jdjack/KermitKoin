@@ -1,0 +1,10 @@
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+<VBox fx:controller="kermit.ReceiveController"
+      xmlns:fx="http://javafx.com/fxml" alignment="baseline_left" spacing="10">
+    <padding><Insets top="25" right="25" bottom="25" left="25"/></padding>
+    <Text fx:id="addressHeading" text="Your address:"/>
+    <Text fx:id="addressField" text="0x1011010010110100"/>
+</VBox>
