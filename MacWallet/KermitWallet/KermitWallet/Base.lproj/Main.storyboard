@@ -717,7 +717,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView translatesAutoresizingMaskIntoConstraints="NO" id="9s3-CL-RVg">
-                                            <rect key="frame" x="70" y="182" width="562" height="177"/>
+                                            <rect key="frame" x="69" y="182" width="562" height="177"/>
                                             <subviews>
                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YdF-t9-FCk">
                                                     <rect key="frame" x="102" y="0.0" width="462" height="177"/>
@@ -747,6 +747,9 @@
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <connections>
+                                                <segue destination="Fnq-0D-x9l" kind="modal" identifier="presentSend" id="0Ij-9P-DZD"/>
+                                            </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="XiU-vK-ZGO">
                                             <rect key="frame" x="398" y="60" width="180" height="60"/>
@@ -755,7 +758,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <segue destination="mK5-Rm-iCd" kind="sheet" id="Qxa-UN-dCf"/>
+                                                <segue destination="mK5-Rm-iCd" kind="sheet" identifier="presentAddress" id="Qxa-UN-dCf"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jbC-js-Efs">
@@ -788,10 +791,130 @@
                             <constraint firstItem="Sj6-a5-Wr8" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="qwW-f8-qbt"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="balanceLabel" destination="YdF-t9-FCk" id="ekj-hz-lVH"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="74" y="953"/>
+            <point key="canvasLocation" x="74" y="1066"/>
+        </scene>
+        <!--Send View Controller-->
+        <scene sceneID="JRh-L1-WJo">
+            <objects>
+                <viewController id="Fnq-0D-x9l" customClass="SendViewController" customModule="KermitWallet" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" wantsLayer="YES" id="x5W-Nb-cZB">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="430"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <box boxType="custom" borderType="none" borderWidth="0.0" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="r53-Wy-aAz">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="430"/>
+                                <view key="contentView" id="Z1p-aK-CSw">
+                                    <rect key="frame" x="0.0" y="0.0" width="600" height="430"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="HEr-Tj-PZj">
+                                            <rect key="frame" x="210" y="63" width="180" height="60"/>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="Send" imagePosition="only" alignment="center" inset="2" id="ARj-TD-0CE">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="sendButtonPressed:" target="Fnq-0D-x9l" id="MWA-Mo-KlX"/>
+                                            </connections>
+                                        </button>
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Nkz-V2-CwH">
+                                            <rect key="frame" x="102" y="188" width="396" height="65"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" placeholderString="0x1234567891234567" id="c8I-3t-Ykc">
+                                                <font key="font" size="36" name="Heebo-Medium"/>
+                                                <color key="textColor" red="0.99215686270000003" green="1" blue="0.99215686270000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <outlet property="delegate" destination="Fnq-0D-x9l" id="JmU-cG-tBm"/>
+                                            </connections>
+                                        </textField>
+                                        <box boxType="custom" borderWidth="0.0" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="2SZ-Zx-9tN">
+                                            <rect key="frame" x="104" y="187" width="392" height="1"/>
+                                            <view key="contentView" id="HKO-Oc-YGA">
+                                                <rect key="frame" x="0.0" y="0.0" width="392" height="1"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            </view>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="1" id="v4C-Gp-bNI"/>
+                                            </constraints>
+                                            <color key="fillColor" red="0.96862745100000003" green="0.97254901959999995" blue="0.98039215690000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        </box>
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="oKq-fJ-DQ6">
+                                            <rect key="frame" x="102" y="319" width="140" height="65"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" focusRingType="none" alignment="center" placeholderString="1,234" id="VKC-BI-doC">
+                                                <font key="font" size="36" name="Heebo-Medium"/>
+                                                <color key="textColor" red="0.99215686270000003" green="1" blue="0.99215686270000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <connections>
+                                                <outlet property="delegate" destination="Fnq-0D-x9l" id="nd5-qy-UT5"/>
+                                            </connections>
+                                        </textField>
+                                        <box boxType="custom" borderWidth="0.0" title="Box" translatesAutoresizingMaskIntoConstraints="NO" id="SBs-yZ-r1o">
+                                            <rect key="frame" x="104" y="318" width="136" height="1"/>
+                                            <view key="contentView" id="7T5-ol-Wna">
+                                                <rect key="frame" x="0.0" y="0.0" width="136" height="1"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            </view>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="1" id="HLr-VB-C4U"/>
+                                                <constraint firstAttribute="width" constant="136" id="K8q-Fc-USu"/>
+                                            </constraints>
+                                            <color key="fillColor" red="0.96862745100000003" green="0.97254901959999995" blue="0.98039215690000003" alpha="1" colorSpace="calibratedRGB"/>
+                                        </box>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="krS-ir-c3I">
+                                            <rect key="frame" x="343" y="330" width="155" height="39"/>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="8,766 Available" id="vBU-1X-pfK">
+                                                <font key="font" size="22" name="Heebo-Medium"/>
+                                                <color key="textColor" red="0.14117647058823529" green="0.50980392156862742" blue="0.19607843137254902" alpha="0.84999999999999998" colorSpace="calibratedRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="oKq-fJ-DQ6" firstAttribute="trailing" secondItem="SBs-yZ-r1o" secondAttribute="trailing" id="2o3-fa-eEm"/>
+                                        <constraint firstAttribute="trailing" secondItem="2SZ-Zx-9tN" secondAttribute="trailing" constant="104" id="6J2-DM-2g6"/>
+                                        <constraint firstItem="SBs-yZ-r1o" firstAttribute="top" secondItem="oKq-fJ-DQ6" secondAttribute="bottom" id="7xq-3Z-0GV"/>
+                                        <constraint firstItem="HEr-Tj-PZj" firstAttribute="centerX" secondItem="Z1p-aK-CSw" secondAttribute="centerX" id="Aud-oM-jvW"/>
+                                        <constraint firstItem="Nkz-V2-CwH" firstAttribute="leading" secondItem="2SZ-Zx-9tN" secondAttribute="leading" id="G34-tG-cFp"/>
+                                        <constraint firstAttribute="bottom" secondItem="HEr-Tj-PZj" secondAttribute="bottom" constant="63" id="L73-lH-s6K"/>
+                                        <constraint firstItem="SBs-yZ-r1o" firstAttribute="leading" secondItem="2SZ-Zx-9tN" secondAttribute="leading" id="X6e-Oo-FFW"/>
+                                        <constraint firstItem="Nkz-V2-CwH" firstAttribute="top" secondItem="SBs-yZ-r1o" secondAttribute="bottom" constant="65" id="baE-Nk-IAS"/>
+                                        <constraint firstItem="2SZ-Zx-9tN" firstAttribute="top" secondItem="Nkz-V2-CwH" secondAttribute="bottom" id="cMp-yV-JJh"/>
+                                        <constraint firstItem="Nkz-V2-CwH" firstAttribute="trailing" secondItem="2SZ-Zx-9tN" secondAttribute="trailing" id="fg6-Bk-3GY"/>
+                                        <constraint firstItem="2SZ-Zx-9tN" firstAttribute="leading" secondItem="Z1p-aK-CSw" secondAttribute="leading" constant="104" id="gMk-vx-WME"/>
+                                        <constraint firstItem="krS-ir-c3I" firstAttribute="trailing" secondItem="HKO-Oc-YGA" secondAttribute="trailing" id="gQN-wW-b1Q"/>
+                                        <constraint firstItem="oKq-fJ-DQ6" firstAttribute="leading" secondItem="SBs-yZ-r1o" secondAttribute="leading" id="lcl-8b-FKm"/>
+                                        <constraint firstItem="Nkz-V2-CwH" firstAttribute="top" secondItem="krS-ir-c3I" secondAttribute="bottom" constant="77" id="mVP-e8-pvU"/>
+                                        <constraint firstItem="HEr-Tj-PZj" firstAttribute="top" secondItem="2SZ-Zx-9tN" secondAttribute="bottom" constant="64" id="oBh-2t-sOs"/>
+                                    </constraints>
+                                </view>
+                                <color key="fillColor" red="0.16862745100000001" green="0.6588235294" blue="0.2901960784" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </box>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="r53-Wy-aAz" firstAttribute="top" secondItem="x5W-Nb-cZB" secondAttribute="top" id="AbT-cd-uhz"/>
+                            <constraint firstAttribute="trailing" secondItem="r53-Wy-aAz" secondAttribute="trailing" id="MYi-fb-56e"/>
+                            <constraint firstItem="r53-Wy-aAz" firstAttribute="leading" secondItem="x5W-Nb-cZB" secondAttribute="leading" id="eW8-AA-Byi"/>
+                            <constraint firstAttribute="bottom" secondItem="r53-Wy-aAz" secondAttribute="bottom" id="v79-tP-1AG"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="amountTextField" destination="oKq-fJ-DQ6" id="K3S-59-8S1"/>
+                        <outlet property="availableLable" destination="krS-ir-c3I" id="Rwz-ZC-aoL"/>
+                        <outlet property="hexTextField" destination="Nkz-V2-CwH" id="EL6-aZ-7Me"/>
+                        <outlet property="sendButton" destination="HEr-Tj-PZj" id="aag-xo-uph"/>
+                    </connections>
+                </viewController>
+                <customObject id="3Za-DB-ZgO" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="74" y="1661"/>
         </scene>
         <!--Receive View Controller-->
         <scene sceneID="iIt-0S-zUl">
@@ -853,10 +976,13 @@
                             <constraint firstItem="d7O-0f-NfH" firstAttribute="top" secondItem="7H0-fS-I3n" secondAttribute="top" constant="36" id="nNO-M2-Sob"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="addressLabel" destination="4Nb-dR-k4Q" id="UAz-2T-cWp"/>
+                    </connections>
                 </viewController>
                 <customObject id="1kA-hz-oCa" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="830" y="953"/>
+            <point key="canvasLocation" x="826" y="1066"/>
         </scene>
     </scenes>
     <resources>

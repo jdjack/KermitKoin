@@ -20,6 +20,8 @@
 		04584A1C201D36B900124077 /* Heebo-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04584A15201D36AD00124077 /* Heebo-ExtraBold.ttf */; };
 		04584A1D201D36B900124077 /* Heebo-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04584A16201D36AD00124077 /* Heebo-Light.ttf */; };
 		04584A1F201D3B9900124077 /* ReceiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04584A1E201D3B9900124077 /* ReceiveViewController.swift */; };
+		04F7B6B7201D74140072C443 /* SendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F7B6B6201D74140072C443 /* SendViewController.swift */; };
+		04F7B6B9201D75AB0072C443 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F7B6B8201D75AB0072C443 /* Constants.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		04584A15201D36AD00124077 /* Heebo-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Heebo-ExtraBold.ttf"; sourceTree = "<group>"; };
 		04584A16201D36AD00124077 /* Heebo-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Heebo-Light.ttf"; sourceTree = "<group>"; };
 		04584A1E201D3B9900124077 /* ReceiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceiveViewController.swift; sourceTree = "<group>"; };
+		04F7B6B6201D74140072C443 /* SendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendViewController.swift; sourceTree = "<group>"; tabWidth = 3; };
+		04F7B6B8201D75AB0072C443 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,8 +97,10 @@
 			isa = PBXGroup;
 			children = (
 				045849F0201D355A00124077 /* AppDelegate.swift */,
+				04F7B6B8201D75AB0072C443 /* Constants.swift */,
 				045849F2201D355A00124077 /* ViewController.swift */,
 				04584A1E201D3B9900124077 /* ReceiveViewController.swift */,
+				04F7B6B6201D74140072C443 /* SendViewController.swift */,
 				045849F4201D355A00124077 /* Assets.xcassets */,
 				045849F6201D355A00124077 /* Main.storyboard */,
 				04584A0E201D36AD00124077 /* Fonts */,
@@ -244,6 +250,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04F7B6B9201D75AB0072C443 /* Constants.swift in Sources */,
+				04F7B6B7201D74140072C443 /* SendViewController.swift in Sources */,
 				045849F3201D355A00124077 /* ViewController.swift in Sources */,
 				04584A1F201D3B9900124077 /* ReceiveViewController.swift in Sources */,
 				045849F1201D355A00124077 /* AppDelegate.swift in Sources */,

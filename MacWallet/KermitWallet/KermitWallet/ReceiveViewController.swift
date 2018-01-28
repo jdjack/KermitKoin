@@ -10,9 +10,14 @@ import Cocoa
 
 class ReceiveViewController: NSViewController {
 
+    var address: String!
+    
+    @IBOutlet weak var addressLabel: NSTextField!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do view setup here.
+        
+        addressLabel.stringValue = address
     }
     
     @IBAction func crossButtonPressed(_ sender: Any) {
