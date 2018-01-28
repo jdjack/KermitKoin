@@ -19,6 +19,7 @@ var BackupIP string = "129.31.197.249"
 
 var seenHashes [][]byte = make([][]byte, 0)
 
+var seenTrans []transaction = make([]transaction, 0)
 
 type Peer struct {
 	IP string `json:"IP"`
@@ -240,6 +241,7 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
   }
 
   r.Body.Close()
+
   if checkIfHashSeen(block.Hash) {
     seenHashes = append(seenHashes, block.Hash)
     SendBlock(block)
@@ -275,4 +277,52 @@ func getMyIP() string {
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
 	return localAddr.IP.String()
+}
+
+func AddTransactionReq(w http.ResponseWriter, r *http.Request) {
+  body, _ := ioutil.ReadAll(r.Body)
+
+  t := &transaction{}
+
+  err := json.Unmarshal(body, t)
+
+  if err != nil {
+    panic(err)
+  }
+
+  r.Body.Close()
+
+  if checkIfTransSeen(t) {
+    TransactionQueue.PushBack(t)
+  }
+}
+
+func checkIfTransSeen(trans *transaction) bool {
+  for _, t := range(seenTrans) {
+    if equalTrans(trans, &t) {
+      return false
+    }
+  }
+  return true
+}
+
+func equalTrans(t1, t2 *transaction) bool {
+  for _, i := range(t1.Inputs) {
+    for _, i1 := range(t2.Inputs) {
+      if i.From != i1.From || i.Amount != i1.Amount || bytes.Compare(i.Hash, i1.Hash) != 0 {
+        return false
+      }
+    }
+  }
+
+  for _, o := range(t1.Outputs) {
+    for _, o1 := range(t2.Outputs) {
+      if o.Amount != o1.Amount && o.To != o1.To {
+        return false
+      }
+    }
+  }
+
+
+  return true
 }

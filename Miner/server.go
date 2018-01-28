@@ -15,6 +15,7 @@ func StartHTTPServer() *http.Server {
 	http.HandleFunc("/getPeers", GetPeersReq)
 	http.HandleFunc("/getBlockchain", GetBlockchainReq)
 	http.HandleFunc("/authorizeBlock", AuthorizeBlockReq)
+	http.HandleFunc("/addTransaction", AddTransactionReq)
 
 	// Start the listening thread
 	go func() {

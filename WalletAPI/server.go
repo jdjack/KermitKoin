@@ -7,22 +7,33 @@ import (
   "strings"
 	"io/ioutil"
   "fmt"
+  "math/rand"
 )
 
 type balance struct {
-  balance float64 `json:"balance"`
+  Balance float64 `json:"balance"`
+}
+
+type Ids struct {
+  Key string `json:"key"`
+  Address string `json:"address"`
+}
+
+type address struct {
+  Address string `json:"Address"`
 }
 
 func StartHTTPServer() *http.Server {
 
-  server := &http.Server{Addr: ":8082"}
+  server := &http.Server{Addr: ":8080"}
 
-  http.HandleFunc("/getBalance/{id}", GetBalanceReq)
-  http.HandleFunc("/getWalletID/{key}", GetWalletAddrReq)
+  server.SetKeepAlivesEnabled(false)
+  http.HandleFunc("/getBalance", GetBalanceReq)
+  http.HandleFunc("/getAddress", GetWalletAddrReq)
   http.HandleFunc("/makeTransaction", MakeTransactionReq)
   http.HandleFunc("/authorizeBlock", AuthorizeBlockReq)
   http.HandleFunc("/getPeers", GetPeersReq)
-	http.HandleFunc("/getBlockchain", GetBlockchainReq)
+  http.HandleFunc("/getBlockchain", GetBlockchainReq)
 
   go func() {
     if err := server.ListenAndServe(); err != nil {
@@ -61,13 +72,15 @@ func GetBalanceReq(w http.ResponseWriter, req *http.Request) {
   }
 
   b := &balance{sum}
-  json, err := json.Marshal(b)
+  fmt.Println(b)
+  j, err := json.Marshal(b)
 
   if err != nil {
     log.Printf("Bad json conversion: %s", err)
   }
 
-  w.Write(json)
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Write(j)
 
 }
 
@@ -77,6 +90,46 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
 
 func GetWalletAddrReq(w http.ResponseWriter, req *http.Request) {
 
+
+  keys, ok := req.URL.Query()["key"]
+
+  if !ok {
+    fmt.Printf("Bad Request")
+    return
+  }
+
+  key := keys[0]
+
+  db, _ := ioutil.ReadFile("keys.json")
+  fmt.Printf(string(db))
+
+  ksList := make([]Ids, 0)
+  err := json.Unmarshal(db, ksList)
+
+  if err != nil {
+    fmt.Printf("Error: %s", err)
+  }
+
+  fmt.Println(ksList)
+  for _, id := range(ksList) {
+    if id.Key == key {
+      output, _ := json.Marshal(&address{id.Address})
+      w.Write(output)
+      return
+    }
+  }
+
+  addr := &Address{rand.Int()}
+  id := &Ids{key, addr.toHex()}
+  ksList = append(ksList, *id)
+
+  j1, _ := json.Marshal(ksList)
+
+  ioutil.WriteFile("keys.json", j1, 0644)
+
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  output, _ := json.Marshal(&address{addr.toHex()})
+  w.Write(output)
 }
 
 func GetPeersReq(w http.ResponseWriter, r *http.Request) {
