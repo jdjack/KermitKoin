@@ -17,6 +17,10 @@ func main() {
 	alwaysOnPeers = LoadAlwaysOnPeers()
 	livePeers = FetchLivePeers()
 
+  if getMyIP() != BackupIP {
+    *CurrentChain = FetchCurrentBlockchain()
+  }
+
 	// Start mining
 	go mine()
 
