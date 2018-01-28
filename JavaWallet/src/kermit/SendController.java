@@ -6,6 +6,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SendController {
 
   private boolean buttonArmed;
@@ -49,14 +52,19 @@ public class SendController {
     });
 
     payeeAddress.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!Pattern.matches("[0-9a-fA-FxX]{0,18}", newValue)) {
+        payeeAddress.setText(oldValue);
+      }
       updateButton();
     });
 
   }
 
   private void updateButton() {
+    Pattern p = Pattern.compile("^0x[0-9a-fA-F]{16}$");
+    Matcher m = p.matcher(payeeAddress.getText());
     boolean buttonActive = !paymentField.getText().isEmpty() &&
-                           !payeeAddress.getText().isEmpty();
+                           m.matches();
     if (buttonActive) {
       activateButton();
     } else {

@@ -75,3 +75,10 @@ TextField {
 #sendButton {
   -fx-padding: 5 40 5 40;
 }
+
+#cbButton {
+  -fx-background-image: url("../../../../clipboard.png");
+  -fx-background-size: 100% 100%;
+  -fx-border-width: 0;
+  -fx-padding: 2 20 2 20;
+}
