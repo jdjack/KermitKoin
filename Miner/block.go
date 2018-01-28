@@ -195,13 +195,10 @@ func Validate(block *Block) bool {
   return true
 }
 
-func (block *Block) Add_transaction(data []byte) bool {
-  t := &transaction{}
-  json.Unmarshal(data, t)
+func (block *Block) Add_transaction(t *transaction) bool {
   if !Verify_transaction(t) {
-    return false
+    return
   }
-
   block.User_transaction = t
   return true
 }
@@ -255,7 +252,7 @@ func CreateBlock(git_hash []byte) bool {
       Hash:   nil,
     }),
     Outputs: append(make([]output, 0), output{
-      To:     "12345",
+      To:     walletAddress,
       Amount: 5.0,
     }),
   }

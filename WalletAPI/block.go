@@ -30,13 +30,13 @@ type Json_block struct {
 }
 
 type input struct {
-  From   int     `json:"From"`
+  From   string     `json:"From"`
   Amount float64 `json:"Amount"`
   Hash   []byte  `json:"Hash"`
 }
 
 type output struct {
-  To     int     `json:"To"`
+  To     string     `json:"To"`
   Amount float64 `json:"Amount"`
 }
 

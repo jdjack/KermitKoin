@@ -9,14 +9,12 @@ import (
 )
 
 type Peer struct {
-	IP string `json:"IP"`
+  IP string `json:"IP"`
 }
 
 var netClient = http.Client{
   Timeout: time.Second * 10,
 }
-
-
 
 var ValidInputs map[string][]input = make(map[string][]input, 0)
 
@@ -27,9 +25,8 @@ var alwaysOnPeers []Peer = make([]Peer, 0)
 
 func main() {
 
-
   alwaysOnPeers = LoadAlwaysOnPeers()
-	livePeers = FetchPeers()
+  livePeers = FetchPeers()
   fmt.Println(livePeers)
   CurrentChain = FetchChain()
 
@@ -38,29 +35,27 @@ func main() {
   server := StartHTTPServer()
   defer ShutdownHTTPServer(server)
 
-
   var text string
-	for text != "shutdown\n" {
-		reader := bufio.NewReader(os.Stdin)
-		text, _ = reader.ReadString('\n')
-	}
+  for text != "shutdown\n" {
+    reader := bufio.NewReader(os.Stdin)
+    text, _ = reader.ReadString('\n')
+  }
 }
 
 func ParseChain() {
-  for _, block := range(CurrentChain.chain) {
+  for _, block := range (CurrentChain.chain) {
 
     ParseBlock(&block)
-
 
   }
 }
 
 func CheckInputs(inputs []input, in input) {
 
-  for index, i := range(inputs) {
+  for index, i := range (inputs) {
     if i.Amount == in.Amount {
       x := inputs[:index]
-      y := inputs[index + 1 :]
+      y := inputs[index+1:]
       inputs = append(x, y...)
       return
     }
@@ -68,21 +63,22 @@ func CheckInputs(inputs []input, in input) {
 
 }
 
-func AddInput(inputs []input, out output, block Block) {
-  inputs = append(inputs, input{out.To, out.Amount, block.Hash})
+func AddInput(inputs []input, out output, block Block) []input {
+  return append(inputs, input{out.To, out.Amount, block.Hash})
 }
 
 func ParseBlock(block *Block) {
-  for _, in := range(block.User_transaction.Inputs) {
-      if inList, ok := ValidInputs[string(in.From)] ; ok {
+  if block.User_transaction != nil {
+    for _, in := range (block.User_transaction.Inputs) {
+      if inList, ok := ValidInputs[string(in.From)]; ok {
 
         CheckInputs(inList, in)
 
       }
     }
 
-    for _, out := range(block.User_transaction.Outputs) {
-      if inList, ok := ValidInputs[string(out.To)] ; ok {
+    for _, out := range (block.User_transaction.Outputs) {
+      if inList, ok := ValidInputs[string(out.To)]; ok {
 
         AddInput(inList, out, *block)
 
@@ -94,5 +90,20 @@ func ParseBlock(block *Block) {
         ValidInputs[string(out.To)] = inputs
       }
     }
-}
 
+  }
+  if (block.Miner_transaction != nil) {
+    out := block.Miner_transaction.Outputs[0]
+    if inList, ok := ValidInputs[string(out.To)]; ok {
+
+      AddInput(inList, out, *block)
+
+    } else {
+
+      inputs := make([]input, 0)
+      inputs = AddInput(inputs, out, *block)
+      ValidInputs[string(out.To)] = inputs
+    }
+  }
+
+}

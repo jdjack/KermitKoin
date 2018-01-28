@@ -6,14 +6,14 @@ import (
   "io/ioutil"
   "fmt"
   "bytes"
+  "container/list"
 )
 
-//var transactionQueue list
+var TransactionQueue *list.List
 
-//func transactionQueue
 func mine() {
 
-  //transactionQueue := list.New()
+  TransactionQueue = list.New()
 
   var username string = GetUserNameFromAuthToken(oAuthToken)
   fmt.Println("Welcome, " + username)
@@ -36,17 +36,23 @@ func mine() {
 
   for ;; {
 
+    currentIndex := CurrentChain.getLatestBlock().Index
     time.Sleep(time.Second * 10)
     commit := GetLatestCommitForUser(username, oAuthToken)
     hash := []byte(commit.ID)
 
     if bytes.Compare(hash, previousHash) != 0 {
-      fmt.Printf("Found New Commit: %v\n With Message: %s - Mining its block!", hash, commit.Message)
-      previousHash = hash
-      ioutil.WriteFile("previous-hash", previousHash, 0644)
-      CreateBlock(hash)
+      if currentIndex == CurrentChain.getLatestBlock().Index {
+        fmt.Printf("Found New Commit: %v\n With Message: %s - Mining its block!", hash, commit.Message)
+        previousHash = hash
+        ioutil.WriteFile("previous-hash", previousHash, 0644)
+        if CreateBlock(hash) {
+          SendBlock(CurrentChain.getLatestBlock())
+        }
+      }
     }
   }
 
 }
+
 
