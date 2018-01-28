@@ -22,10 +22,10 @@ public class Main extends Application {
 
   @Override
   public void start(Stage primaryStage) throws Exception {
-    initMyID();
-    initAddressURL();
+    //initMyID();
+    //initAddressURL();
     initWalletAddress();
-    initURLs();
+    //initURLs();
     getBalance();
     FXMLLoader loader = new FXMLLoader(getClass().getResource("walletUI.fxml"));
     Parent root = loader.load();
@@ -39,11 +39,12 @@ public class Main extends Application {
   }
 
   public void getBalance() throws IOException {
-    URLConnection connection = addressURL.openConnection();
-    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-    balance = Float.parseFloat(in.readLine());
-    System.out.println(balance);
-    in.close();
+//    URLConnection connection = addressURL.openConnection();
+//    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//    balance = Float.parseFloat(in.readLine());
+//    System.out.println(balance);
+//    in.close();
+    balance = 13.37f;
   }
 
   private void initURLs() throws MalformedURLException {
@@ -58,16 +59,17 @@ public class Main extends Application {
   }
 
   private void initWalletAddress() throws IOException {
-    File file = new File("walletAddress.ser");
-    if (file.createNewFile()) {
-      String myAddress = getWalletAddress();
-      BufferedWriter writer = new BufferedWriter(new FileWriter("walletAddress.ser"));
-      writer.write(myAddress);
-      writer.close();
-    }
-    BufferedReader reader = new BufferedReader(new FileReader("walletAddress.ser"));
-    walletAddress = reader.readLine();
-    reader.close();
+//    File file = new File("walletAddress.ser");
+//    if (file.createNewFile()) {
+//      String myAddress = getWalletAddress();
+//      BufferedWriter writer = new BufferedWriter(new FileWriter("walletAddress.ser"));
+//      writer.write(myAddress);
+//      writer.close();
+//    }
+//    BufferedReader reader = new BufferedReader(new FileReader("walletAddress.ser"));
+//    walletAddress = reader.readLine();
+//    reader.close();
+    walletAddress = "0x1234567890abcdef";
   }
 
   private String getWalletAddress() throws IOException {
