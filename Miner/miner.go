@@ -41,7 +41,7 @@ func mine() {
     commit := GetLatestCommitForUser(username, oAuthToken)
     hash := []byte(commit.ID)
 
-    if bytes.Compare(hash, previousHash) == 0 {
+    if bytes.Compare(hash, previousHash) != 0 {
       if currentIndex == CurrentChain.getLatestBlock().Index {
         fmt.Printf("Found New Commit: %v\n With Message: %s - Mining its block!", hash, commit.Message)
         previousHash = hash
