@@ -292,9 +292,16 @@ func SendBlock(block *Block) {
   jsonBlock := block.Block_to_json()
 
   for _, peer := range(livePeers) {
+    fmt.Println(peer.IP)
     url := "http://" + peer.IP + ":8081/authorizeBlock"
+    url2 := "http://" + peer.IP + ":8080/authorizeBlock"
 
     req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBlock)))
+    if err != nil {
+      log.Fatal(err)
+    }
+
+    req2, err := http.NewRequest("POST", url2, strings.NewReader(string(jsonBlock)))
 
     if err != nil {
       log.Fatal(err)
@@ -303,6 +310,7 @@ func SendBlock(block *Block) {
     fmt.Print("Sending Block\n")
 
     netClient.Do(req)
+    netClient.Do(req2)
   }
 }
 
