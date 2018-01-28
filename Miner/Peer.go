@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 	"time"
+  "io/ioutil"
 )
 
 type Peer struct {
@@ -127,11 +128,10 @@ func FetchLivePeers() []Peer {
 
 	rand.Seed(time.Now().UnixNano())
 
-	fmt.Println(alwaysOnPeers)
 	// Choose a random always-on peer to connect to
 	randAlwaysOnPeer := rand.Intn(len(alwaysOnPeers))
 	randKnownIP := alwaysOnPeers[randAlwaysOnPeer].IP
-	r, err := netClient.Get("http://" + randKnownIP + "/getPeers")
+	r, err := netClient.Get("http://" + randKnownIP + ":8081/getPeers")
 	if err != nil {
 
 		// Remove this peer from the list
