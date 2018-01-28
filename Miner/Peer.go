@@ -206,8 +206,9 @@ func FetchCurrentBlockchain() *Chain {
 func GetBlockchainReq(w http.ResponseWriter, r *http.Request) {
 
 	// Give the user the current blockchain
-	encoded, err := json.Marshal(CurrentChain)
-	if err != nil {
+	fmt.Println(CurrentChain.chain)
+	encoded, err := json.Marshal(CurrentChain.chain)
+	if err == nil {
 		_, err := w.Write(encoded)
 		if err != nil {
 			log.Fatal(err)
@@ -223,11 +224,11 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch the request paramater
 
-	decoder := json.NewDecoder(r.Body)
+	body, _ := ioutil.ReadAll(r.Body)
 
 	block := &Block{}
 
-	err := decoder.Decode(block)
+	err := json.Unmarshal(body, block)
 
 	if err != nil {
 	  panic(err)
