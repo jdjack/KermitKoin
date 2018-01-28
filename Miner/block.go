@@ -208,9 +208,33 @@ func AuthoriseBlock(block *Block) bool {
     return false
   }
 
+
   latestBlock := CurrentChain.getLatestBlock()
+
+  if (block.Index == latestBlock.Index) {
+    RejectedChain := CurrentChain
+    RejectedChain.RemoveLatestBlock()
+
+    if bytes.Compare(block.Prev_hash, RejectedChain.getLatestBlock().Hash) == 0 {
+      RejectedChain.addBlock(*block)
+      return false
+    }
+
+
+  }
+
   if bytes.Compare(latestBlock.Hash, block.Prev_hash) == 0 {
     CurrentChain.addBlock(*block)
+  } else if RejectedChain != nil {
+    otherLatestBlock := RejectedChain.getLatestBlock()
+    if bytes.Compare(otherLatestBlock.Hash, block.Prev_hash) == 0 {
+      RejectedChain.addBlock(*otherLatestBlock)
+    }
+    if (RejectedChain.isLonger(CurrentChain)) {
+      temp := RejectedChain
+      RejectedChain = CurrentChain
+      CurrentChain = temp
+    }
   }
 
   return true
