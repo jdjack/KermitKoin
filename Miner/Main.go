@@ -1,47 +1,36 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"bufio"
+	"os"
+	"fmt"
 )
 
-type Peer struct {
-	ID   string `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
-}
-
-var peers []Peer
-
+var oAuthToken string
 func main() {
 
-	// Put some dummy people in the struct
-	peers = append(peers, Peer{ID: "1", Name: "Tom"})
+  oAuthToken = os.Args[1]
+	// Start the server
+	server := StartHTTPServer()
+	defer ShutdownHTTPServer(server)
 
-	// Create a new router to route requests
-	router := mux.NewRouter()
+	// Load always-on peers
+	alwaysOnPeers = LoadAlwaysOnPeers()
+	livePeers = FetchLivePeers()
+  fmt.Println(livePeers)
+  if getMyIP() != BackupIP {
+    CurrentChain = FetchCurrentBlockchain()
+    CurrentChain.saveChain()
+  }
 
-	// Route endpoints to function handlers
-	router.HandleFunc("/getPeers", GetPeers).Methods("GET")
-	router.HandleFunc("/getBlockchain/", GetBlockchain).Methods("GET")
-	router.HandleFunc("/authorizeBlock/{block}", AuthorizeBlock).Methods("POST")
+	// Start mining
+	go mine()
 
-	// Unknown request sent
-	log.Fatal(http.ListenAndServe(":8081", router))
-
-}
-
-// Each handler function has a 'w' (write) and 'r' (read) parameter
-func GetPeers(w http.ResponseWriter, r *http.Request) {
-
-	json.NewEncoder(w).Encode(peers)
-
-}
-func GetBlockchain(w http.ResponseWriter, r *http.Request) {
-
-}
-func AuthorizeBlock(w http.ResponseWriter, r *http.Request) {
+	// Listen for a command from the front-end
+	var text string
+	for text != "shutdown\n" {
+		reader := bufio.NewReader(os.Stdin)
+		text, _ = reader.ReadString('\n')
+	}
 
 }
