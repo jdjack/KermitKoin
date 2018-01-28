@@ -61,7 +61,7 @@ public class SendController {
   }
 
   private void updateButton() {
-    Pattern p = Pattern.compile("^0x[0-9a-fA-F]{16}$");
+    Pattern p = Pattern.compile("^0[Xx][0-9a-fA-F]{16}$");
     Matcher m = p.matcher(payeeAddress.getText());
     boolean buttonActive = !paymentField.getText().isEmpty() &&
                            m.matches();
