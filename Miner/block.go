@@ -181,8 +181,11 @@ func Validate(block *Block) bool {
     return false
   }
 
-  if !Verify_transaction(block.User_transaction) {
-    return false
+  if block.User_transaction != nil {
+    if !Verify_transaction(block.User_transaction) {
+      return false
+    }
+
   }
 
   if !CheckCommitExistanceForUser(block.UserName, string(block.Git_hash), oAuthToken) {
@@ -266,10 +269,11 @@ func CreateBlock(git_hash []byte) bool {
   }
 
   block.Hash = block.Generate_hash()
-
+  seenHashes = append(seenHashes, block.Hash)
   fmt.Println("Test")
   CurrentChain.addBlock(*block)
   block.Save_block()
+
 
   return true
 
