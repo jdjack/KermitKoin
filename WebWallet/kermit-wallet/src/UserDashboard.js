@@ -13,7 +13,12 @@ class UserDashboard extends Component {
     this.handleRecieveClick = this.handleRecieveClick.bind(this);
     this.handleSendClick = this.handleSendClick.bind(this);
     this.handleBalanceClick = this.handleBalanceClick.bind(this);
+    this.getWalletID = this.getWalletID.bind(this);
     this.state = {display: "balance"};
+  }
+
+  getWalletID(event) {
+    return this.props.getWalletID();
   }
 
   handleLogoutClick(event) {
@@ -40,14 +45,17 @@ class UserDashboard extends Component {
     let content = null;
     switch (display) {
       case "send":
-        content = <SendDisplay />;
+        content = <SendDisplay
+                    getWalletID={this.getWalletID} />;
         break;
      case "recieve":
-        content = <RecieveDisplay />;
+        content = <RecieveDisplay
+                    getWalletID={this.getWalletID} />;
         break;
       case "balance":
       default:
-        content = <BalanceDisplay />;
+        content = <BalanceDisplay
+                     getWalletID={this.getWalletID} />;
     }
 
     let buttons = null;
@@ -77,11 +85,10 @@ class UserDashboard extends Component {
 
     return (
       <div id="UserDashboard">
-        <h3>Dashboard</h3>
-        <LogoutButton
-          handleLogoutClick={this.handleLogoutClick} />
         {content}
         {buttons}
+        <LogoutButton
+        handleLogoutClick={this.handleLogoutClick} />
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Button from './Button';
-import firebase from './firebase'
+import firebase from './firebase';
 import sha256 from 'sha256';
 
 class RegisterForm extends Component {
@@ -66,27 +66,27 @@ class RegisterForm extends Component {
 
     // Send request to wallet to get the user's wallet address
     // TODO: tweak parameters
-    const req = 'http://' + host_ip + ':8082/getAddress?key=' + timestamp;
-    console.log(req);
-    axios.get('http://' + host_ip + ':8082/getAddress?key=' + timestamp)
-    .then(response => this.setState({wallet_addr: response.data.name}),
-          (error) => { console.log(error) })
-    .then(function(result) {
+    axios.get('http://' + host_ip + ':8080/getAddress?key=' + timestamp)
+    .then(response => {
+      this.setState({ wallet_address: response.data.Address})
+    },
+    (error) => { console.log(error) })
+    .then(response => {
+      console.log(this.state)
 
-      // Now add this user to the database
-      const usersRef = firebase.database().ref('users');
+     // Now add this user to the database
+     const usersRef = firebase.database().ref('users');
 
-      const user = {
-        username: this.state.username,
-        password: sha256(this.state.password),
-        timestamp: timestamp,
-        wallet_addr: this.state.wallet_addr
-      }
+     const user = {
+       username: this.state.username,
+       password: sha256(this.state.password),
+       timestamp: timestamp,
+       wallet_addr: this.state.wallet_address
+     };
 
       usersRef.push(user);
 
     });
-    // TODO: update on response
 
   }
 
@@ -114,7 +114,7 @@ class RegisterForm extends Component {
 
     return (
       <div id="RegisterPage">
-        <h4>REGISTERING</h4>
+        <h4>Register</h4>
 
         <div id="RegisterForm">
           <form onSubmit={this.handleSubmit}>

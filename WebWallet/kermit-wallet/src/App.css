@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css?family=Heebo:100,300,400');
+
+body {
+  background: rgb(51, 167, 78);
+  color: rgb(253, 255, 253);
+  text-align: center;
+  padding: 60px;
+  font-size: 18px;
+  font-family: 'Heebo', sans-serif;
+}
+
+h1 {
+  font-weight: 100;
+  font-size: 70px;
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  padding: 15px;
+}
+
+
+
+input:not([type='submit']) {
+  background-color: transparent;
+  border: 0 none;
+      border-bottom-width: 0px;
+      border-bottom-style: none;
+      border-bottom-color: currentcolor;
+  padding: 10px;
+  border-bottom: 1px solid #FFFFFF;
+  color: inherit;
+  font-size: inherit;
+  margin-left: 30px;
+}
+
+input[type='submit'], button {
+  background: transparent;
+  border: 2px solid white;
+  border-radius: 30px;
+  padding: 15px;
+  width: 198px;
+  font-size: inherit;
+  color: inherit;
+  transition: all 80ms;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+input[type='submit'] {
+  margin-top: 15px;
+}
+
+#RegisterButton, #DashboardButtons {
+  margin-top: 15px;
+}
+
+input[type='submit']:hover, button:hover {
+  background: white;
+  color: rgb(51, 167, 78);
+}
+
+#LogOutButton {
+  padding: 10px;
+      padding-right: 10px;
+      padding-left: 10px;
+  width: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  font-size: 15px;
+  margin-top: 25px;
+}
+
+#BalanceDisplayContent, #RecieveDisplayWalletAddress {
+  font-weight: bold;
+  font-size: 80px;
+  margin: 0;
+      margin-bottom: 0px;
+  margin-bottom: 20px;
+}
+
+#RecieveDisplayWalletAddress {
+  font-size: 60px;
+}
+
+#YourAddressLabel {
+  margin-bottom: 0;
+}
+
+#ErrMsg {
+  font-weight: bold;
+  color: #600;
+}

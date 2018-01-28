@@ -13,8 +13,21 @@ class LoginControl extends Component {
     this.handleLoggedInSuccess = this.handleLoggedInSuccess.bind(this);
     this.handleRegisterSuccess = this.handleRegisterSuccess.bind(this);
 
-    this.state = {isLoggedIn: false};
+    this.setWalletID = this.setWalletID.bind(this);
+    this.getWalletID = this.getWalletID.bind(this);
+
+    this.state = {isLoggedIn: false}
     this.state = {isRegistering: false};
+    this.state = {walletID: ""};
+  }
+
+  setWalletID(id) {
+    console.log("SETTING WALLET ID");
+    this.setState({walletID: id});
+  }
+
+  getWalletID() {
+    return this.state.walletID;
   }
 
   handleLogoutClick() {
@@ -45,15 +58,16 @@ class LoginControl extends Component {
     else if (!isLoggedIn) {
       content = <LoginForm
                   handleLoggedInSuccess={this.handleLoggedInSuccess}
-                  handleRegisterClick={this.handleRegisterClick} />;
+                  handleRegisterClick={this.handleRegisterClick}
+                  setWalletID={this.setWalletID} />;
     } else {
       content = <UserDashboard
-                  handleLogoutClick={this.handleLogoutClick} />;
+                  handleLogoutClick={this.handleLogoutClick}
+                  getWalletID={this.getWalletID} />;
     }
 
     return (
       <div>
-        <h2>Welcome!</h2>
         {content}
       </div>
     );
