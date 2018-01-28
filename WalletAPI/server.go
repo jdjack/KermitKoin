@@ -106,7 +106,10 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
   fmt.Println(destID)
   fmt.Println(amount)
 
+  ownID = strings.ToLower(ownID)
   ourValidInputs := ValidInputs[ownID]
+
+  fmt.Println(ownID)
 
   var counter float64 = 0
   index := 0
@@ -162,6 +165,8 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
       netClient.Do(req)
     }
 
+
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Write([]byte("Success"))
 
   } else {
