@@ -187,12 +187,12 @@ func FetchCurrentBlockchain() *Chain {
 		if err != nil {
 			log.Fatal(err)
 		}
-		chain := &Chain{}
-		err = json.Unmarshal(buf.Bytes(), chain)
+		blocks := &[]Block{}
+		err = json.Unmarshal(buf.Bytes(), blocks)
 		if err != nil {
 			log.Fatal(err)
 		}
-
+    chain.chain = *blocks
 
 		success = true
 
