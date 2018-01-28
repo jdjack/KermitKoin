@@ -1,5 +1,6 @@
 package main
 
+import "fmt"
 
 var CurrentChain *Chain
 
@@ -32,5 +33,8 @@ func (chain *Chain) getLatestBlock() *Block {
 
 func (chain *Chain) addBlock(block Block) {
   chain.chain = append(chain.chain, block)
+  fmt.Println("Block Recieved")
+  ValidInputs = make(map[string][]input)
+  ParseChain()
 }
 

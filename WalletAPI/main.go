@@ -48,6 +48,7 @@ func ParseChain() {
     ParseBlock(&block)
 
   }
+
 }
 
 func CheckInputs(inputs []input, in input) {
@@ -80,30 +81,33 @@ func ParseBlock(block *Block) {
     for _, out := range (block.User_transaction.Outputs) {
       if inList, ok := ValidInputs[string(out.To)]; ok {
 
-        AddInput(inList, out, *block)
+        ValidInputs[string(out.To)] = AddInput(inList, out, *block)
 
       } else {
 
         inputs := make([]input, 0)
-        AddInput(inputs, out, *block)
+        inputs = AddInput(inputs, out, *block)
 
         ValidInputs[string(out.To)] = inputs
       }
     }
 
   }
-  if (block.Miner_transaction != nil) {
-    out := block.Miner_transaction.Outputs[0]
-    if inList, ok := ValidInputs[string(out.To)]; ok {
+  if block.Miner_transaction != nil {
+    if block.Miner_transaction.Outputs != nil {
+      out := block.Miner_transaction.Outputs[0]
+      if inList, ok := ValidInputs[string(out.To)]; ok {
 
-      AddInput(inList, out, *block)
+        ValidInputs[string(out.To)] = AddInput(inList, out, *block)
 
-    } else {
+      } else {
 
-      inputs := make([]input, 0)
-      inputs = AddInput(inputs, out, *block)
-      ValidInputs[string(out.To)] = inputs
+        inputs := make([]input, 0)
+        inputs = AddInput(inputs, out, *block)
+        ValidInputs[string(out.To)] = inputs
+      }
     }
+
   }
 
 }

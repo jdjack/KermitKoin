@@ -268,14 +268,14 @@ func CreateBlock(git_hash []byte) bool {
   }
 
   t := TransactionQueue.Front()
-  var trans transaction
+  var trans *transaction
   if t != nil {
     TransactionQueue.Remove(t)
-    trans = t.Value.(transaction)
+    trans = t.Value.(*transaction)
   }
-  for !block.Add_transaction(&trans) && t != nil {
+  for !block.Add_transaction(trans) && t != nil {
     t = TransactionQueue.Front()
-    trans = t.Value.(transaction)
+    trans = t.Value.(*transaction)
   }
   block.Hash = block.Generate_hash()
   seenHashes = append(seenHashes, block.Hash)
