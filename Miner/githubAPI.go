@@ -1,11 +1,11 @@
 package main
 
 import (
-  "fmt"
-  "net/http"
-  "bytes"
-  "io/ioutil"
-  "encoding/json"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
 type Commit struct {
@@ -37,23 +37,23 @@ func GetLatestCommitForUser(username string, oAuthToken string) *Commit {
   req.Header.Set("Authorization", "Bearer " + oAuthToken)
   req.Header.Set("Content-Type", "application/json")
 
-  client := &http.Client{}
-  resp, err := client.Do(req)
-  if err != nil {
-    panic(err)
-  }
-  defer resp.Body.Close()
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
-  body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 
-  var dat map[string]interface{}
+	var dat map[string]interface{}
 
-  if err := json.Unmarshal(body, &dat); err != nil {
-    panic(err)
-  }
+	if err := json.Unmarshal(body, &dat); err != nil {
+		panic(err)
+	}
 
-  mostRecentTime := "1970-01-01T01:01:01Z"
-  var mostRecentCommit *Commit = nil
+	mostRecentTime := "1970-01-01T01:01:01Z"
+	var mostRecentCommit *Commit = nil
 
   commitList := dat["data"].(map[string]interface{})["viewer"].(map[string]interface{})["repositories"].(map[string]interface{})["nodes"].([]interface{})
   for _, commit := range commitList {
@@ -64,12 +64,12 @@ func GetLatestCommitForUser(username string, oAuthToken string) *Commit {
       continue
     }
 
-    for _, edge := range edges {
-      castedEdge := edge.(map[string]interface{})
-      edgeUsername := castedEdge["node"].(map[string]interface{})["author"].(map[string]interface{})["user"].(map[string]interface{})["login"].(string)
-      if username != edgeUsername {
-        continue
-      }
+		for _, edge := range edges {
+			castedEdge := edge.(map[string]interface{})
+			edgeUsername := castedEdge["node"].(map[string]interface{})["author"].(map[string]interface{})["user"].(map[string]interface{})["login"].(string)
+			if username != edgeUsername {
+				continue
+			}
 
       date := castedEdge["node"].(map[string]interface{})["committedDate"].(string)
       oid := castedEdge["node"].(map[string]interface{})["oid"].(string)
@@ -80,11 +80,10 @@ func GetLatestCommitForUser(username string, oAuthToken string) *Commit {
       }
     }
 
-  }
+	}
 
   return mostRecentCommit
 }
-
 
 func CheckCommitExistanceForUser(username string, hash string, oAuthToken string) bool {
 
