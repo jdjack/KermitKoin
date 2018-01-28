@@ -182,17 +182,17 @@ func FetchCurrentBlockchain() *Chain {
 		defer r.Body.Close()
 
 		// Decode the response
-		buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
+		buf := bytes.NewBuffer(make([]byte, 0))
 		_, err = buf.ReadFrom(r.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
-		chain := &Chain{}
-		err = json.Unmarshal(buf.Bytes(), chain)
+		blocks := make([]Block,0)
+		err = json.Unmarshal(buf.Bytes(), &blocks)
 		if err != nil {
 			log.Fatal(err)
 		}
-
+    chain.chain = blocks
 
 		success = true
 

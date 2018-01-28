@@ -24,7 +24,7 @@ type Block struct {
   Timestamp         int64        `json:"timestamp"`
   Miner_transaction *transaction `json:"miner_transaction"`
   User_transaction  *transaction `json:"user_transaction"`
-  Hash              []byte       `jason:"hash"`
+  Hash              []byte       `json:"hash"`
 }
 
 type Json_block struct {
@@ -237,6 +237,7 @@ func CreateBlock(git_hash []byte) bool {
     Git_hash:          git_hash,
     User_transaction:  nil,
     Timestamp:         time.Now().Unix(),
+    UserName:          GetUserNameFromAuthToken(oAuthToken),
     Miner_transaction: miner_transaction,
   }
 
@@ -254,13 +255,15 @@ func SendBlock(block *Block) {
   jsonBlock := block.Block_to_json()
 
   for _, peer := range(livePeers) {
-    url := "http://" + peer.IP + ":8081/authoriseBlock/"
+    url := "http://" + peer.IP + ":8081/authorizeBlock"
 
     req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBlock)))
 
     if err != nil {
       log.Fatal(err)
     }
+
+    fmt.Print("Sending Block\n")
 
     netClient.Do(req)
   }
