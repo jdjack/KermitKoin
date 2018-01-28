@@ -15,7 +15,7 @@ import (
   "fmt"
 )
 
-var BackupIP string = "129.31.197.249"
+var BackupIP string = "129.31.236.46"
 
 var seenHashes [][]byte = make([][]byte, 0)
 
@@ -293,6 +293,7 @@ func AddTransactionReq(w http.ResponseWriter, r *http.Request) {
   r.Body.Close()
 
   if checkIfTransSeen(t) {
+    SendTransaction(t)
     TransactionQueue.PushBack(t)
   }
 }

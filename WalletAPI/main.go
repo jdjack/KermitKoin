@@ -18,7 +18,7 @@ var netClient = http.Client{
 
 var ValidInputs map[string][]input = make(map[string][]input, 0)
 
-var BackupIP string = "129.31.197.249"
+var BackupIP string = "129.31.236.46"
 
 var livePeers []Peer = make([]Peer, 0)
 var alwaysOnPeers []Peer = make([]Peer, 0)
