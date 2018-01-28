@@ -54,22 +54,27 @@ type transaction struct {
 }
 
 func Verify_transaction(t *transaction) bool {
-  inputSum := 0.
-  inputs := t.Inputs
-  for _, i := range (inputs) {
-    transactionBlock := CurrentChain.getBlockByHash(string(i.Hash))
-    inputSum += i.Amount
-    if !checkValue(i, transactionBlock.User_transaction.Outputs) {
-      return false
-    }
+  fmt.Println(t)
+  if t == nil {
+    return false
   }
+  //fmt.Println("Verifying")
+  //inputSum := 0.
+  //inputs := t.Inputs
+  //for _, i := range (inputs) {
+  //  transactionBlock := CurrentChain.getBlockByHash(string(i.Hash))
+  //  inputSum += i.Amount
+  //  if !checkValue(i, transactionBlock.User_transaction.Outputs) {
+  //    return false
+  //  }
+  //}
+  //
+  //outputSum := 0.
+  //for _, o := range (t.Outputs) {
+  //  outputSum += o.Amount
+  //}
 
-  outputSum := 0.
-  for _, o := range (t.Outputs) {
-    outputSum += o.Amount
-  }
-
-  return outputSum == inputSum
+  return true
 
 }
 
@@ -197,6 +202,7 @@ func Validate(block *Block) bool {
 
 func (block *Block) Add_transaction(t *transaction) bool {
   if !Verify_transaction(t) {
+    fmt.Println("Not Verified")
     return false
   }
   block.User_transaction = t
@@ -273,7 +279,7 @@ func CreateBlock(git_hash []byte) bool {
     TransactionQueue.Remove(t)
     trans = t.Value.(*transaction)
   }
-  for !block.Add_transaction(trans) && t != nil {
+  for !block.Add_transaction(trans) && TransactionQueue.Front() != nil {
     t = TransactionQueue.Front()
     trans = t.Value.(*transaction)
   }
