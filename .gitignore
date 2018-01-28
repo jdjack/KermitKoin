@@ -14,3 +14,17 @@
 .glide/
 
 Miner/\.idea/
+
+JavaWallet/\.idea/
+
+JavaWallet/KermitKoin\.iml
+
+*.class
+
+JavaWallet/out/production/KermitKoin/kermit/receivePopup\.fxml
+
+JavaWallet/out/production/KermitKoin/kermit/sendForm\.fxml
+
+JavaWallet/out/production/KermitKoin/kermit/wallet\.css
+
+JavaWallet/out/production/KermitKoin/kermit/walletUI\.fxml

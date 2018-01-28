@@ -1,0 +1,77 @@
+/*green = R100 G167 B82
+white = R253 G255 B253
+grey = R79 G129 B59 */
+
+@font-face {
+  font-family: 'heebo';
+  font-style: normal;
+  font-weight: normal;
+  src: local('heebo', url('https://fonts.googleapis.com/css?family=Heebo';) format('truetype');
+}
+
+.root {
+  -fx-background-color: rgb(100, 167, 82);
+}
+
+#frogView {
+  -fx-background-image: url("../../../../frog.png");
+  -fx-background-size: 100% 100%;
+}
+
+Text {
+  -fx-fill: rgb(253, 255, 253);
+
+}
+
+#titleText {
+  -fx-font-size: 40;
+}
+
+#balanceText {
+  -fx-font-size: 80;
+  -fx-font-weight: bold;
+}
+
+Button {
+  -fx-text-fill: rgb(253, 255, 253);
+  -fx-background-color: rgba(0,0,0,0);
+  -fx-border-color: rgb(253, 255, 253);
+  -fx-border-width: 2;
+  -fx-border-style: solid;
+  -fx-border-radius: 30;
+  -fx-padding: 5 20 5 20;
+  -fx-font-size: 24;
+}
+
+#addressHeading {
+  -fx-font-size: 24;
+}
+
+#addressField {
+  -fx-font-size: 36;
+  -fx-font-weight: bold;
+}
+
+TextField {
+  -fx-background-color: rgba(0,0,0,0);
+  -fx-text-fill: rgb(253, 255, 253);
+  -fx-prompt-text-fill: rgb(79, 129, 59);
+  -fx-font-size: 36;
+  -fx-border-color: rgb(253, 255, 253);
+  -fx-border-width: 0 0 2 0;
+  -fx-border-style: solid;
+}
+
+#availableTracker {
+  -fx-fill: rgb(79, 129, 59);
+  -fx-font-size: 30;
+}
+
+#availableText {
+  -fx-fill: rgb(79, 129, 59);
+  -fx-font-size: 30;
+}
+
+#sendButton {
+  -fx-padding: 5 40 5 40;
+}
