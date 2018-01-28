@@ -38,13 +38,13 @@ type Json_block struct {
 }
 
 type input struct {
-  From   int     `json:"From"`
+  From   string     `json:"From"`
   Amount float64 `json:"Amount"`
   Hash   []byte  `json:"Hash"`
 }
 
 type output struct {
-  To     int     `json:"To"`
+  To     string     `json:"To"`
   Amount float64 `json:"Amount"`
 }
 
@@ -250,12 +250,12 @@ func CreateBlock(git_hash []byte) bool {
 
   miner_transaction := &transaction{
     Inputs: append(make([]input, 0), input{
-      From:   0,
+      From:   "",
       Amount: 5.0,
       Hash:   nil,
     }),
     Outputs: append(make([]output, 0), output{
-      To:     12344,
+      To:     "12345",
       Amount: 5.0,
     }),
   }
