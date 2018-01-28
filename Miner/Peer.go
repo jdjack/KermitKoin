@@ -19,7 +19,7 @@ var BackupIP string = "129.31.236.46"
 
 var seenHashes [][]byte = make([][]byte, 0)
 
-var seenTrans []transaction = make([]transaction, 0)
+var seenTrans [][]byte = make([][]byte, 0)
 
 type Peer struct {
 	IP string `json:"IP"`
@@ -292,15 +292,17 @@ func AddTransactionReq(w http.ResponseWriter, r *http.Request) {
 
   r.Body.Close()
 
-  if checkIfTransSeen(t) {
+  if checkIfTransSeen(body) {
+    seenTrans = append(seenTrans, body)
+    fmt.Println(seenTrans)
     SendTransaction(t)
     TransactionQueue.PushBack(t)
   }
 }
 
-func checkIfTransSeen(trans *transaction) bool {
+func checkIfTransSeen(trans []byte) bool {
   for _, t := range(seenTrans) {
-    if equalTrans(trans, &t) {
+    if  bytes.Compare(trans, t) == 0 {
       return false
     }
   }
@@ -308,6 +310,8 @@ func checkIfTransSeen(trans *transaction) bool {
 }
 
 func equalTrans(t1, t2 *transaction) bool {
+
+
   for _, i := range(t1.Inputs) {
     for _, i1 := range(t2.Inputs) {
       if i.From != i1.From || i.Amount != i1.Amount || bytes.Compare(i.Hash, i1.Hash) != 0 {
@@ -318,7 +322,7 @@ func equalTrans(t1, t2 *transaction) bool {
 
   for _, o := range(t1.Outputs) {
     for _, o1 := range(t2.Outputs) {
-      if o.Amount != o1.Amount && o.To != o1.To {
+      if o.Amount != o1.Amount || o.To != o1.To {
         return false
       }
     }

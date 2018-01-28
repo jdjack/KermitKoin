@@ -58,13 +58,14 @@ func ShutdownHTTPServer(server *http.Server) {
 func GetBalanceReq(w http.ResponseWriter, req *http.Request) {
 
   walletID, ok := req.URL.Query()["id"]
+  lowerWalletID := strings.ToLower(walletID[0])
 
   if !ok {
     fmt.Printf("Bad Request")
     return
   }
 
-  inputs := ValidInputs[walletID[0]]
+  inputs := ValidInputs[lowerWalletID]
 
   var sum float64 = 0
 
@@ -250,7 +251,7 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
   r.Body.Close()
 
-  ParseBlock(block)
+  CurrentChain.addBlock(*block)
 
 
 	// Call json_to_block
