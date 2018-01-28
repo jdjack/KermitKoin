@@ -101,7 +101,15 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
   amountStr := amounts[0]
   amount, _ := strconv.ParseFloat(amountStr, 64)
 
+  fmt.Println("============")
+  fmt.Println(ownID)
+  fmt.Println(destID)
+  fmt.Println(amount)
+
+  ownID = strings.ToLower(ownID)
   ourValidInputs := ValidInputs[ownID]
+
+  fmt.Println(ownID)
 
   var counter float64 = 0
   index := 0
@@ -115,6 +123,8 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
   }
 
   change := counter - amount
+
+  fmt.Println(change)
 
   if change < 0 {
     fmt.Printf("Insufficient Funds")
@@ -131,8 +141,14 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
 
   transac := transaction{inputsUsed, outputs}
 
+  fmt.Println(transac)
+
   // Encode the response and send it
   encoded, err := json.Marshal(transac)
+
+  fmt.Println(encoded)
+
+  fmt.Println("============")
 
   if err == nil {
     for _, peer := range(livePeers) {
@@ -149,6 +165,8 @@ func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
       netClient.Do(req)
     }
 
+
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Write([]byte("Success"))
 
   } else {
@@ -170,17 +188,17 @@ func GetWalletAddrReq(w http.ResponseWriter, req *http.Request) {
   key := keys[0]
 
   db, _ := ioutil.ReadFile("keys.json")
-  fmt.Printf(string(db))
 
   ksList := make([]Ids, 0)
-  err := json.Unmarshal(db, ksList)
+  err := json.Unmarshal(db, &ksList)
 
   if err != nil {
     fmt.Printf("Error: %s", err)
   }
 
-  fmt.Println(ksList)
+
   for _, id := range(ksList) {
+    //fmt.Println(id)
     if id.Key == key {
       output, _ := json.Marshal(&address{id.Address})
       w.Write(output)
@@ -239,6 +257,7 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch the request paramater
 
+
 	body, _ := ioutil.ReadAll(r.Body)
 
 	block := &Block{}
@@ -250,6 +269,8 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
   }
 
   r.Body.Close()
+
+  fmt.Print(block)
 
   CurrentChain.addBlock(*block)
 

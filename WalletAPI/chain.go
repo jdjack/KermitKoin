@@ -34,7 +34,7 @@ func (chain *Chain) getLatestBlock() *Block {
 func (chain *Chain) addBlock(block Block) {
   chain.chain = append(chain.chain, block)
   fmt.Println("Block Recieved")
-  ValidInputs = make(map[string][]input)
+  ValidInputs = make(map[string][]input, 0)
   ParseChain()
 }
 
