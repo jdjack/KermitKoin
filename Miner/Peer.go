@@ -14,6 +14,7 @@ import (
   "io/ioutil"
 )
 
+var BackupIP string = "129.31.197.249"
 type Peer struct {
 	IP string `json:"IP"`
 }
@@ -63,13 +64,12 @@ func GetPeersReq(w http.ResponseWriter, r *http.Request) {
 func LoadAlwaysOnPeers() []Peer {
 
 	path := "/peers.txt"
-	backupIP := "129.31.196.107"
 
 	// If the file does not exist, use the backup IP
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 
 		singletonResult := make([]Peer, 0)
-		if getMyIP() == backupIP {
+		if getMyIP() == BackupIP {
 
 			// I am the genesis user - load the blockchain if needed
 			if CurrentChain == nil {
@@ -91,9 +91,10 @@ func LoadAlwaysOnPeers() []Peer {
 
 			// Do nothing, no peers
 			return singletonResult
+
 		}
 
-		singletonResult = append(singletonResult, Peer{backupIP})
+		singletonResult = append(singletonResult, Peer{BackupIP})
 		return singletonResult
 	}
 
@@ -164,7 +165,7 @@ func FetchCurrentBlockchain() Chain {
 	for !success {
 
 		// Choose a random peer to get the chain from
-		randPeerIndex := rand.Intn(len(livePeers) - 1)
+		randPeerIndex := rand.Intn(len(livePeers))
 		randPeerIP := livePeers[randPeerIndex].IP
 		r, err := netClient.Get("http://" + randPeerIP + ":8081/getBlockchain")
 
