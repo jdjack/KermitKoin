@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
   "io/ioutil"
+  "fmt"
 )
 
 var BackupIP string = "129.31.197.249"
@@ -236,9 +237,9 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
   r.Body.Close()
 
-  if AuthoriseBlock(block) {
-    SendBlock(block)
-  }
+  SendBlock(block)
+  AuthoriseBlock(block)
+
 
 	// Call json_to_block
 
