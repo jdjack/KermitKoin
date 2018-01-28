@@ -36,6 +36,10 @@ func (chain *Chain) getLatestBlock() *Block {
   return &chain.chain[len(chain.chain) - 1]
 }
 
+func (chain *Chain) RemoveLatestBlock() {
+  chain.chain = chain.chain[:len(chain.chain) - 1]
+}
+
 func (chain *Chain) validate() bool {
   for index, block := range chain.chain {
     // Check blocks are valid.
