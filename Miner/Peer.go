@@ -16,6 +16,10 @@ import (
 )
 
 var BackupIP string = "129.31.197.249"
+
+var seenHashes [][]byte = make([][]byte, 0)
+
+
 type Peer struct {
 	IP string `json:"IP"`
 }
@@ -236,9 +240,12 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
   }
 
   r.Body.Close()
+  if checkIfHashSeen(block.Hash) {
+    seenHashes = append(seenHashes, block.Hash)
+    SendBlock(block)
+    AuthoriseBlock(block)
 
-  SendBlock(block)
-  AuthoriseBlock(block)
+  }
 
 
 	// Call json_to_block
@@ -246,6 +253,15 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 	// Pass the result to authorize block
 	// Return true or false if successful authorized
 
+}
+
+func checkIfHashSeen(hash []byte) bool {
+  for _, h := range(seenHashes) {
+    if bytes.Compare(h, hash) == 0 {
+      return false
+    }
+  }
+  return true
 }
 
 func getMyIP() string {
