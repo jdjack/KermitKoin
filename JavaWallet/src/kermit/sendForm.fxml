@@ -1,0 +1,26 @@
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.GridPane?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<GridPane fx:controller="kermit.SendController"
+          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="40" vgap="40">
+    <gridLinesVisible>false</gridLinesVisible>
+    <padding><Insets top="25" right="100" bottom="25" left="100"/></padding>
+    <TextField fx:id="paymentField" promptText="1234"
+               GridPane.columnIndex="0" GridPane.rowIndex="0"
+               />
+    <HBox GridPane.columnIndex="1" GridPane.rowIndex="0" spacing="10" alignment="CENTER">
+        <Text fx:id="availableTracker" text="4321"/>
+        <Text fx:id="availableText" text="Available"/>
+    </HBox>
+    <TextField fx:id="payeeAddress" promptText="0x0101010101010101"
+               GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2"/>
+    <HBox GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
+          alignment="BASELINE_CENTER">
+        <Button fx:id="sendButton" text="Send" onAction="#handleSendButtonAction"/>
+    </HBox>
+
+</GridPane>

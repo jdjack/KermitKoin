@@ -11,7 +11,14 @@ import (
 	"os"
 	"strings"
 	"time"
+  "io/ioutil"
+  "fmt"
 )
+
+var BackupIP string = "129.31.197.249"
+
+var seenHashes [][]byte = make([][]byte, 0)
+
 
 type Peer struct {
 	IP string `json:"IP"`
@@ -28,12 +35,30 @@ func GetPeersReq(w http.ResponseWriter, r *http.Request) {
 
 	// Add the requester to the list of alive IP's
 	client := strings.Split(r.RemoteAddr, ":")[0]
-	livePeers = append(livePeers, Peer{client})
+
+
+	peersWithoutClient := make([]Peer, 0)
+
+	isInLivePeers := false
+	for _, livePeer := range livePeers {
+		if livePeer.IP == client {
+			isInLivePeers = true
+		} else {
+			peersWithoutClient = append(peersWithoutClient, livePeer)
+		}
+	}
+
+	if !isInLivePeers {
+		livePeers = append(livePeers, Peer{client})
+	}
 
 	// Encode the response and send it
-	encoded, err := json.Marshal(livePeers)
-	if err != nil {
+	encoded, err := json.Marshal(peersWithoutClient)
+
+	if err == nil {
+
 		w.Write(encoded)
+
 	} else {
 		log.Fatal(err)
 	}
@@ -44,18 +69,37 @@ func GetPeersReq(w http.ResponseWriter, r *http.Request) {
 func LoadAlwaysOnPeers() []Peer {
 
 	path := "/peers.txt"
-	backupIP := "129.31.196.107"
 
 	// If the file does not exist, use the backup IP
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 
 		singletonResult := make([]Peer, 0)
-		if getMyIP() == backupIP {
+		if getMyIP() == BackupIP {
+
+			// I am the genesis user - load the blockchain if needed
+			if CurrentChain == nil {
+				CurrentChain = &Chain{}
+				files, err := ioutil.ReadDir("chain-data/")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				for _, f := range files {
+					if f.Name() == ".DS_Store" {
+						continue
+					}
+
+					b := load_block_with_filename(f.Name())
+					CurrentChain.addBlock(*b)
+				}
+			}
+
 			// Do nothing, no peers
 			return singletonResult
+
 		}
 
-		singletonResult = append(singletonResult, Peer{backupIP})
+		singletonResult = append(singletonResult, Peer{BackupIP})
 		return singletonResult
 	}
 
@@ -91,9 +135,9 @@ func FetchLivePeers() []Peer {
 	rand.Seed(time.Now().UnixNano())
 
 	// Choose a random always-on peer to connect to
-	randAlwaysOnPeer := rand.Intn(len(alwaysOnPeers) - 1)
+	randAlwaysOnPeer := rand.Intn(len(alwaysOnPeers))
 	randKnownIP := alwaysOnPeers[randAlwaysOnPeer].IP
-	r, err := netClient.Get("http://" + randKnownIP + "/getPeers")
+	r, err := netClient.Get("http://" + randKnownIP + ":8081/getPeers")
 	if err != nil {
 
 		// Remove this peer from the list
@@ -114,21 +158,22 @@ func FetchLivePeers() []Peer {
 	body := buf.Bytes()
 	livePeers := make([]Peer, 0)
 	json.Unmarshal(body, &livePeers)
+	livePeers = append(livePeers, alwaysOnPeers[randAlwaysOnPeer])
 
 	return livePeers
 }
 
 // Fetch the current blockchain from one of the live peers
-func FetchCurrentBlockchain() Chain {
+func FetchCurrentBlockchain() *Chain {
 
 	success := false
 	chain := &Chain{}
 	for !success {
 
 		// Choose a random peer to get the chain from
-		randPeerIndex := rand.Intn(len(livePeers) - 1)
+		randPeerIndex := rand.Intn(len(livePeers))
 		randPeerIP := livePeers[randPeerIndex].IP
-		r, err := netClient.Get("http://" + randPeerIP + "/getBlockchain")
+		r, err := netClient.Get("http://" + randPeerIP + ":8081/getBlockchain")
 
 		if err != nil {
 			// Remove this peer from the list
@@ -142,18 +187,23 @@ func FetchCurrentBlockchain() Chain {
 		defer r.Body.Close()
 
 		// Decode the response
-		buf := bytes.NewBuffer(make([]byte, 0, r.ContentLength))
+		buf := bytes.NewBuffer(make([]byte, 0))
 		_, err = buf.ReadFrom(r.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
-		// body := buf.Bytes()
-		// TODO: pass to liam
+		blocks := make([]Block,0)
+		err = json.Unmarshal(buf.Bytes(), &blocks)
+		if err != nil {
+			log.Fatal(err)
+		}
+    chain.chain = blocks
+
 		success = true
 
 	}
 
-	return *chain
+	return chain
 
 }
 
@@ -161,8 +211,9 @@ func FetchCurrentBlockchain() Chain {
 func GetBlockchainReq(w http.ResponseWriter, r *http.Request) {
 
 	// Give the user the current blockchain
-	encoded, err := json.Marshal(CurrentChain)
-	if err != nil {
+	fmt.Println(CurrentChain.chain)
+	encoded, err := json.Marshal(CurrentChain.chain)
+	if err == nil {
 		_, err := w.Write(encoded)
 		if err != nil {
 			log.Fatal(err)
@@ -178,6 +229,25 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 	// Fetch the request paramater
 
+	body, _ := ioutil.ReadAll(r.Body)
+
+	block := &Block{}
+
+	err := json.Unmarshal(body, block)
+
+	if err != nil {
+	  panic(err)
+  }
+
+  r.Body.Close()
+  if checkIfHashSeen(block.Hash) {
+    seenHashes = append(seenHashes, block.Hash)
+    SendBlock(block)
+    AuthoriseBlock(block)
+
+  }
+
+
 	// Call json_to_block
 
 	// Pass the result to authorize block
@@ -185,31 +255,24 @@ func AuthorizeBlockReq(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func checkIfHashSeen(hash []byte) bool {
+  for _, h := range(seenHashes) {
+    if bytes.Compare(h, hash) == 0 {
+      return false
+    }
+  }
+  return true
+}
+
 func getMyIP() string {
 
-	ifaces, _ := net.Interfaces()
-	var result string
-	// handle err
-	for _, i := range ifaces {
-		addrs, _ := i.Addrs()
-		// handle err
-		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
-
-			// Determine if we are a 4-byte or 16-byte IP address
-			stringIP := ip.String()
-			if stringIP != "" {
-				result = stringIP
-			}
-
-		}
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
 	}
-	return result
+	defer conn.Close()
 
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+
+	return localAddr.IP.String()
 }

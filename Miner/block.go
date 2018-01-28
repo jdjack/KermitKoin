@@ -11,52 +11,52 @@ import (
   "strings"
   "os"
   "bytes"
+  "time"
+  "net/http"
+  "log"
 )
 
-var userName string
-var oAuthToken string
-
 type Block struct {
-  Index int `json:"index"`
-  Prev_hash []byte `json:"prev_hash"`
-  Git_hash []byte `json:"git_hash"`
-  Repo_id []byte `json:"repo_id"`
-  Timestamp int `json:"timestamp"`
+  Index             int          `json:"index"`
+  Prev_hash         []byte       `json:"prev_hash"`
+  Git_hash          []byte       `json:"git_hash"`
+  UserName          string       `json:"userName"`
+  Timestamp         int64        `json:"timestamp"`
   Miner_transaction *transaction `json:"miner_transaction"`
-  User_transaction *transaction `json:"user_transaction"`
-  Hash []byte `jason:"hash"`
+  User_transaction  *transaction `json:"user_transaction"`
+  Hash              []byte       `json:"hash"`
 }
 
 type Json_block struct {
-  Index int `json:"index"`
+  Index     int    `json:"index"`
   Prev_hash []byte `json:"prev_hash"`
-  Git_hash []byte `json:"git_hash"`
-  Repo_id []byte `json:"repo_id"`
+  Git_hash  []byte `json:"git_hash"`
+  Repo_id   []byte `json:"repo_id"`
   Timestamp []byte `json:"timestamp"`
-  Data []byte `json:"data"`
-  Hash []byte `json:"hash"`
+  Data      []byte `json:"data"`
+  Hash      []byte `json:"hash"`
 }
 
 type input struct {
-  From []byte `json:"From"`
+  From   string     `json:"From"`
   Amount float64 `json:"Amount"`
-  Hash []byte `json:"Hash"`
+  Hash   []byte  `json:"Hash"`
 }
 
 type output struct {
-  To []byte `json:"To"`
+  To     string     `json:"To"`
   Amount float64 `json:"Amount"`
 }
 
 type transaction struct {
-  Inputs []input `json:"Inputs"`
+  Inputs  []input  `json:"Inputs"`
   Outputs []output `json:"Outputs"`
 }
 
 func Verify_transaction(t *transaction) bool {
   inputSum := 0.
   inputs := t.Inputs
-  for _, i := range(inputs) {
+  for _, i := range (inputs) {
     transactionBlock := CurrentChain.getBlockByHash(string(i.Hash))
     inputSum += i.Amount
     if !checkValue(i, transactionBlock.User_transaction.Outputs) {
@@ -65,22 +65,46 @@ func Verify_transaction(t *transaction) bool {
   }
 
   outputSum := 0.
-  for _, o := range(t.Outputs) {
+  for _, o := range (t.Outputs) {
     outputSum += o.Amount
   }
 
   return outputSum == inputSum
 
-
 }
 
 func checkValue(i input, outputs []output) bool {
-  for _, o := range(outputs) {
-    if bytes.Compare(o.To, i.From) == 0 && o.Amount == i.Amount {
+  for _, o := range (outputs) {
+    if o.To == i.From && o.Amount == i.Amount {
       return true
     }
   }
   return false
+}
+
+func load_block(index int) *Block {
+  filename := int_to_filename(index) + ".json"
+
+  block := &Block{}
+  if _, err := os.Stat("chain-data/" + filename); os.IsExist(err) {
+    jsonBlock, _ := ioutil.ReadFile("chain-data/" + filename)
+    _= json.Unmarshal(jsonBlock, block)
+  }
+  return block
+}
+
+func load_block_with_filename(filename string) *Block {
+  block := &Block{}
+
+  if _, err := os.Stat("chain-data/" + filename); os.IsNotExist(err) {
+    return block
+  }
+
+  jsonBlock, _ := ioutil.ReadFile("chain-data/" + filename)
+  _= json.Unmarshal(jsonBlock, block)
+
+  return block
+
 }
 
 func (block *Block) Generate_hash() []byte {
@@ -137,16 +161,16 @@ func Json_to_block(json_string []byte) *Block {
 
 func (block *Block) Save_block() {
   filename := int_to_filename(block.Index)
-  if _, err := os.Stat("chain-data") ; os.IsNotExist(err) {
+  if _, err := os.Stat("chain-data"); os.IsNotExist(err) {
     os.Mkdir("chain-data", 0700)
   }
-  ioutil.WriteFile("chain-data/" + filename + ".json", block.Block_to_json(), 0644)
+  ioutil.WriteFile("chain-data/"+filename+".json", block.Block_to_json(), 0644)
 }
 
 func int_to_filename(i int) string {
   // Create string with at least 16 digits
   str := strconv.Itoa(i)
-  zeroes := strings.Repeat("0", 16 - len(str))
+  zeroes := strings.Repeat("0", 16-len(str))
   return zeroes + str
 
 }
@@ -157,11 +181,14 @@ func Validate(block *Block) bool {
     return false
   }
 
-  if !Verify_transaction(block.User_transaction) {
-    return false
+  if block.User_transaction != nil {
+    if !Verify_transaction(block.User_transaction) {
+      return false
+    }
+
   }
 
-  if !CheckCommitExistanceForUser(userName, string(block.Git_hash), oAuthToken) {
+  if !CheckCommitExistanceForUser(block.UserName, string(block.Git_hash), oAuthToken) {
     return false
   }
 
@@ -180,7 +207,94 @@ func (block *Block) Add_transaction(data []byte) bool {
 }
 
 func AuthoriseBlock(block *Block) bool {
+  if !Validate(block) {
+    return false
+  }
 
-  return false
+
+  latestBlock := CurrentChain.getLatestBlock()
+
+  if (block.Index == latestBlock.Index) {
+    RejectedChain := CurrentChain
+    RejectedChain.RemoveLatestBlock()
+
+    if bytes.Compare(block.Prev_hash, RejectedChain.getLatestBlock().Hash) == 0 {
+      RejectedChain.addBlock(*block)
+      return false
+    }
+
+
+  }
+
+  if bytes.Compare(latestBlock.Hash, block.Prev_hash) == 0 {
+    CurrentChain.addBlock(*block)
+  } else if RejectedChain != nil {
+    otherLatestBlock := RejectedChain.getLatestBlock()
+    if bytes.Compare(otherLatestBlock.Hash, block.Prev_hash) == 0 {
+      RejectedChain.addBlock(*otherLatestBlock)
+    }
+    if (RejectedChain.isLonger(CurrentChain)) {
+      temp := RejectedChain
+      RejectedChain = CurrentChain
+      CurrentChain = temp
+    }
+  }
+
+  block.Save_block()
+
+  return true
 }
 
+func CreateBlock(git_hash []byte) bool {
+  lastBlock := CurrentChain.getLatestBlock()
+
+  miner_transaction := &transaction{
+    Inputs: append(make([]input, 0), input{
+      From:   "",
+      Amount: 5.0,
+      Hash:   nil,
+    }),
+    Outputs: append(make([]output, 0), output{
+      To:     "12345",
+      Amount: 5.0,
+    }),
+  }
+
+  block := &Block{
+    Index:             lastBlock.Index + 1,
+    Prev_hash:         lastBlock.Hash,
+    Git_hash:          git_hash,
+    User_transaction:  nil,
+    Timestamp:         time.Now().Unix(),
+    UserName:          GetUserNameFromAuthToken(oAuthToken),
+    Miner_transaction: miner_transaction,
+  }
+
+  block.Hash = block.Generate_hash()
+  seenHashes = append(seenHashes, block.Hash)
+  fmt.Println("Test")
+  CurrentChain.addBlock(*block)
+  block.Save_block()
+
+
+  return true
+
+}
+
+func SendBlock(block *Block) {
+  jsonBlock := block.Block_to_json()
+
+  for _, peer := range(livePeers) {
+    url := "http://" + peer.IP + ":8081/authorizeBlock"
+
+    req, err := http.NewRequest("POST", url, strings.NewReader(string(jsonBlock)))
+
+    if err != nil {
+      log.Fatal(err)
+    }
+
+    fmt.Print("Sending Block\n")
+
+    netClient.Do(req)
+  }
+}

@@ -3,10 +3,13 @@ package main
 import (
 	"bufio"
 	"os"
+	"fmt"
 )
 
+var oAuthToken string
 func main() {
 
+  oAuthToken = os.Args[1]
 	// Start the server
 	server := StartHTTPServer()
 	defer ShutdownHTTPServer(server)
@@ -14,9 +17,14 @@ func main() {
 	// Load always-on peers
 	alwaysOnPeers = LoadAlwaysOnPeers()
 	livePeers = FetchLivePeers()
+  fmt.Println(livePeers)
+  if getMyIP() != BackupIP {
+    CurrentChain = FetchCurrentBlockchain()
+    CurrentChain.saveChain()
+  }
 
 	// Start mining
-	// go mine()
+	go mine()
 
 	// Listen for a command from the front-end
 	var text string

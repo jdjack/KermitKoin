@@ -14,7 +14,7 @@ func StartHTTPServer() *http.Server {
 	// Reroute the functions
 	http.HandleFunc("/getPeers", GetPeersReq)
 	http.HandleFunc("/getBlockchain", GetBlockchainReq)
-	http.HandleFunc("/authorizeBlock/{block}", AuthorizeBlockReq)
+	http.HandleFunc("/authorizeBlock", AuthorizeBlockReq)
 
 	// Start the listening thread
 	go func() {

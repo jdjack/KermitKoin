@@ -6,7 +6,7 @@ var CurrentChain *Chain
 var RejectedChain *Chain
 
 type Chain struct {
-  chain []Block
+  chain []Block `json:"chain"`
 }
 
 func (chain *Chain) isLonger(chain2 *Chain) bool {
@@ -30,6 +30,14 @@ func (chain *Chain) getBlockByHash(hash string) *Block {
     }
   }
   return nil
+}
+
+func (chain *Chain) getLatestBlock() *Block {
+  return &chain.chain[len(chain.chain) - 1]
+}
+
+func (chain *Chain) RemoveLatestBlock() {
+  chain.chain = chain.chain[:len(chain.chain) - 1]
 }
 
 func (chain *Chain) validate() bool {
