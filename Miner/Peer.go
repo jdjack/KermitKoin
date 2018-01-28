@@ -153,12 +153,13 @@ func FetchLivePeers() []Peer {
 	body := buf.Bytes()
 	livePeers := make([]Peer, 0)
 	json.Unmarshal(body, &livePeers)
+	livePeers = append(livePeers, alwaysOnPeers[randAlwaysOnPeer])
 
 	return livePeers
 }
 
 // Fetch the current blockchain from one of the live peers
-func FetchCurrentBlockchain() Chain {
+func FetchCurrentBlockchain() *Chain {
 
 	success := false
 	chain := &Chain{}
@@ -192,13 +193,12 @@ func FetchCurrentBlockchain() Chain {
 			log.Fatal(err)
 		}
 
-		CurrentChain = chain
 
 		success = true
 
 	}
 
-	return *chain
+	return chain
 
 }
 

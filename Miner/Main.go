@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"os"
+	"fmt"
 )
 
 var oAuthToken string
@@ -16,9 +17,10 @@ func main() {
 	// Load always-on peers
 	alwaysOnPeers = LoadAlwaysOnPeers()
 	livePeers = FetchLivePeers()
-
+  fmt.Println(livePeers)
   if getMyIP() != BackupIP {
-    *CurrentChain = FetchCurrentBlockchain()
+    CurrentChain = FetchCurrentBlockchain()
+    CurrentChain.saveChain()
   }
 
 	// Start mining
