@@ -33,6 +33,8 @@ func main() {
   fmt.Println(livePeers)
   CurrentChain = FetchChain()
 
+  ParseChain()
+
   server := StartHTTPServer()
   defer ShutdownHTTPServer(server)
 
@@ -46,21 +48,10 @@ func main() {
 
 func ParseChain() {
   for _, block := range(CurrentChain.chain) {
-    for _, in := range(block.User_transaction.Inputs) {
-      if inList, ok := ValidInputs[string(in.From)] ; ok {
 
-        CheckInputs(inList, in)
+    ParseBlock(&block)
 
-      }
-    }
 
-    for _, out := range(block.User_transaction.Outputs) {
-      if _, ok := ValidInputs[string(out.To)] ; ok {
-
-        //CheckOutputs(inList, in)
-
-      }
-    }
   }
 }
 
@@ -77,9 +68,31 @@ func CheckInputs(inputs []input, in input) {
 
 }
 
-func CheckOutputs(outputs []output, out output) {
+func AddInput(inputs []input, out output, block Block) {
+  inputs = append(inputs, input{out.To, out.Amount, block.Hash})
+}
 
-  //for _, o := range(outputs) {}
-  //
-  }
+func ParseBlock(block *Block) {
+  for _, in := range(block.User_transaction.Inputs) {
+      if inList, ok := ValidInputs[string(in.From)] ; ok {
+
+        CheckInputs(inList, in)
+
+      }
+    }
+
+    for _, out := range(block.User_transaction.Outputs) {
+      if inList, ok := ValidInputs[string(out.To)] ; ok {
+
+        AddInput(inList, out, *block)
+
+      } else {
+
+        inputs := make([]input, 0)
+        AddInput(inputs, out, *block)
+
+        ValidInputs[string(out.To)] = inputs
+      }
+    }
+}
 
