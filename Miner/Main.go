@@ -7,9 +7,11 @@ import (
 )
 
 var oAuthToken string
+var walletAddress string
 func main() {
 
   oAuthToken = os.Args[1]
+  walletAddress = os.Args[2]
 	// Start the server
 	server := StartHTTPServer()
 	defer ShutdownHTTPServer(server)

@@ -7,22 +7,34 @@ import (
   "strings"
 	"io/ioutil"
   "fmt"
+  "math/rand"
+  "strconv"
 )
 
 type balance struct {
-  balance float64 `json:"balance"`
+  Balance float64 `json:"balance"`
+}
+
+type Ids struct {
+  Key string `json:"key"`
+  Address string `json:"address"`
+}
+
+type address struct {
+  Address string `json:"Address"`
 }
 
 func StartHTTPServer() *http.Server {
 
-  server := &http.Server{Addr: ":8082"}
+  server := &http.Server{Addr: ":8080"}
 
-  http.HandleFunc("/getBalance/{id}", GetBalanceReq)
-  http.HandleFunc("/getWalletID/{key}", GetWalletAddrReq)
+  server.SetKeepAlivesEnabled(false)
+  http.HandleFunc("/getBalance", GetBalanceReq)
+  http.HandleFunc("/getAddress", GetWalletAddrReq)
   http.HandleFunc("/makeTransaction", MakeTransactionReq)
   http.HandleFunc("/authorizeBlock", AuthorizeBlockReq)
   http.HandleFunc("/getPeers", GetPeersReq)
-	http.HandleFunc("/getBlockchain", GetBlockchainReq)
+  http.HandleFunc("/getBlockchain", GetBlockchainReq)
 
   go func() {
     if err := server.ListenAndServe(); err != nil {
@@ -61,22 +73,131 @@ func GetBalanceReq(w http.ResponseWriter, req *http.Request) {
   }
 
   b := &balance{sum}
-  json, err := json.Marshal(b)
+  fmt.Println(b)
+  j, err := json.Marshal(b)
 
   if err != nil {
     log.Printf("Bad json conversion: %s", err)
   }
 
-  w.Write(json)
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  w.Write(j)
 
 }
 
 func MakeTransactionReq(w http.ResponseWriter, req *http.Request) {
+  ownIDs, ok := req.URL.Query()["ownID"]
+  destIDs, ok1 := req.URL.Query()["destID"]
+  amounts, ok2 := req.URL.Query()["amount"]
+
+  if !(ok && ok1 && ok2) {
+    fmt.Printf("Bad Request")
+    return
+  }
+
+  ownID := ownIDs[0]
+  destID := destIDs[0]
+  amountStr := amounts[0]
+  amount, _ := strconv.ParseFloat(amountStr, 64)
+
+  ourValidInputs := ValidInputs[ownID]
+
+  var counter float64 = 0
+  index := 0
+  inputsUsed := make([]input, 0)
+
+  for counter < amount {
+    inp := ourValidInputs[index]
+    counter += inp.Amount
+    inputsUsed = append(inputsUsed, inp)
+    index++
+  }
+
+  change := counter - amount
+
+  if change < 0 {
+    fmt.Printf("Insufficient Funds")
+    return
+  }
+
+  outputs := make([]output, 0)
+  recipientOutput := output{destID, amount}
+  outputs = append(outputs, recipientOutput)
+  if change != 0 {
+    selfOutput := output{ownID, change}
+    outputs = append(outputs, selfOutput)
+  }
+
+  transac := transaction{inputsUsed, outputs}
+
+  // Encode the response and send it
+  encoded, err := json.Marshal(transac)
+
+  if err == nil {
+    for _, peer := range(livePeers) {
+      url := "http://" + peer.IP + ":8081/addTransaction"
+
+      req, err := http.NewRequest("POST", url, strings.NewReader(string(encoded)))
+
+      if err != nil {
+        log.Fatal(err)
+      }
+
+      fmt.Print("Sending Block\n")
+
+      netClient.Do(req)
+    }
+
+    w.Write([]byte("Success"))
+
+  } else {
+    log.Fatal(err)
+  }
 
 }
 
 func GetWalletAddrReq(w http.ResponseWriter, req *http.Request) {
 
+
+  keys, ok := req.URL.Query()["key"]
+
+  if !ok {
+    fmt.Printf("Bad Request")
+    return
+  }
+
+  key := keys[0]
+
+  db, _ := ioutil.ReadFile("keys.json")
+  fmt.Printf(string(db))
+
+  ksList := make([]Ids, 0)
+  err := json.Unmarshal(db, ksList)
+
+  if err != nil {
+    fmt.Printf("Error: %s", err)
+  }
+
+  fmt.Println(ksList)
+  for _, id := range(ksList) {
+    if id.Key == key {
+      output, _ := json.Marshal(&address{id.Address})
+      w.Write(output)
+      return
+    }
+  }
+
+  addr := &Address{rand.Int()}
+  id := &Ids{key, addr.toHex()}
+  ksList = append(ksList, *id)
+
+  j1, _ := json.Marshal(ksList)
+
+  ioutil.WriteFile("keys.json", j1, 0644)
+
+  w.Header().Set("Access-Control-Allow-Origin", "*")
+  output, _ := json.Marshal(&address{addr.toHex()})
+  w.Write(output)
 }
 
 func GetPeersReq(w http.ResponseWriter, r *http.Request) {
